@@ -17,10 +17,23 @@ export default class Feature implements IFeature {
     public config: any; // T_TwitterFeatureConfig;
 
     constructor() {
-        const { badge } = this.adapter.widgets;
+        const overlay = Core.overlay({ url: 'https://localhost:10001/src/index.html', title: 'Identity Service' });
+        const { badge, button } = this.adapter.widgets;
         const { popup } = this.adapter2.widgets;
 
         this.config = {
+            TWEET_SOUTH: [
+                button({
+                    initial: "DEFAULT",
+                    "DEFAULT": {
+                        img: PICTURE,
+                        label: '',
+                        exec: (ctx) => {
+                            overlay.sendAndListen('tweet_select', ctx, {});
+                        }
+                    }
+                })
+            ],
             TWEET_AVATAR_BADGE: [
                 badge({
                     initial: "DEFAULT",
