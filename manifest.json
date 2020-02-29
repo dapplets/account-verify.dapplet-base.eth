@@ -1,7 +1,7 @@
 {
     "name": "account-verify.dapplet-base.eth",
     "branch": "default",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "FEATURE",
     "title": "Account Verification",
     "description": "Display a Verified Account Mark if the account is owned by the ethereum id",
