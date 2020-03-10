@@ -1,6 +1,6 @@
 {
   "name": "account-verify.dapplet-base.eth",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Display a Verified Account Mark if the account is owned by the ethereum id",
   "main": "lib/index.js",
   "scripts": {
