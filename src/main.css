@@ -1,7 +1,7 @@
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Ubuntu, sans-serif;
     box-sizing: border-box;
-    padding: 30px 15px 30px 15px;
+    padding: 30px 15px 30px 30px;
 }
 textarea {
     resize: none;
@@ -15,6 +15,52 @@ p {
     margin: 2px;
 }
 
+div#ISHeader {
+    position: fixed;
+    top: 0px;
+    left: 0;
+    right: 0;
+    max-height: 50px;
+    min-height: 50px;
+    height: 50px;
+    padding: 10px 22px;
+    border-bottom: 1px solid rgb(204, 214, 221);
+    background-color: #f5f8fa;
+}
+
+h1#ISHeaderText {
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    left: 30px;
+    margin: 8px;
+    color: rgb(244, 93, 34);
+    max-width: 310px;
+    max-height: 50px;
+    font-size: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#ISBackArrow {
+    display: none;
+    position: absolute;
+    top: 24px;
+}
+
+#ISHelp {
+    position: absolute;
+    right: 20px;
+    top: 24px;
+}
+
+#ISBackArrow img {
+    width: 30px;
+}
+
+div#ISActionArea {
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
 #ISUserInfo {
     display: flex;
     flex-direction: row;
@@ -85,6 +131,14 @@ input:disabled.is-action-btn {
     border: none;
 }
 
+p#ISConfirmPostText {
+    word-break: break-word;
+}
+
+p#ISPostText {
+    word-break: break-word;
+}
+
 #ISAssociateContainer {
     display: none;
 }
@@ -96,6 +150,19 @@ input:disabled.is-action-btn {
 #ISConfirmPostInfo {
     display: none;
 }
+
+div#ISFirstStepSuccessContainer {
+    display: none;
+}
+
+div#ISFirstStepSuccessContainer h3 {
+    color: green;
+}
+
+div#ISErrorContainer h3 {
+    color: red;
+}
+
 
 div#ISMatchText {
     text-align: center;

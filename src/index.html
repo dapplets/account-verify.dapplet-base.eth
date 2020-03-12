@@ -12,47 +12,78 @@
 </head>
 
 <body>
-<div id="ISActionArea">
-    <div class="is-container" id="ISContextContainer">
-        <div id="ISUserInfo">
-            <img id="ISAvatar" src="./avatar.png" alt="" >
-            <div id="ISUsernameText">
-                <h3 id="ISUserFullname"></h3>
-                <p id="ISUsername"></p>
-            </div>
+    <div id="ISHeader">
+        <!-- <div id="ISBackArrow">
+            <img src="./back.svg" alt="">
+        </div> -->
+        <input type="image" src="./back.svg" width="25px" id="ISBackArrow">
+        <h1 id="ISHeaderText">Identity Service</h1>
+        <input type="image" src="./question.svg" width="25px" id="ISHelp">
+    </div>
+    <div id="ISActionArea">
+        <div class="is-container" id="ISContextContainer">
+            <div id="ISUserInfo">
+                <img id="ISAvatar" src="./avatar.png" alt="" >
+                <div id="ISUsernameText">
+                    <h3 id="ISUserFullname"></h3>
+                    <p id="ISUsername"></p>
+                </div>
 
+            </div>
+            <div id="ISPostInfo"  class="is-text-container">
+                <p id="ISPostText"></p>
+                <p id="ISStringID">ID: <span id="ISIdentificator" ></span></p>
+                <div></div>
+            </div>
         </div>
-        <div id="ISPostInfo"  class="is-text-container">
-            <p id="ISPostText"></p>
-            <p id="ISStringID">ID: <span id="ISIdentificator" ></span></p>
-            <div></div>
+        <div class="is-container"  id="ISActionContainer">
+            <input type="button" class="is-action-btn" id="ISensStart" value="Associate this profile with my ENS">
+            <input type="button" class="is-action-btn" id="ISComplaint" value="I want to complain">
+        </div>
+        <div class="is-container"  id="ISTwoStepsContainer">
+            <input type="button" class="is-action-btn" id="ISFirstStepAction" value="1. Confirm by the social network profile">
+            <input type="button" class="is-action-btn" id="ISSecondStepAction" value="2. Confirm by ENS system" disabled>
+        </div>
+        <div class="is-container"  id="ISAssociateContainer">
+            <div id="ISMatchText"   class="is-text-container">
+                <h3 id="ISMatchName"></h3>
+                <p>This is your name?</p>
+            </div>
+            <input type="button" class="is-action-btn" id="ISensContinue" value="Yes, continue with this name">
+            <input type="button" class="is-action-btn is-alt-btn" id="ISNotMy" value="No, that's not my name">
+        </div>
+        <div class="is-container"  id="ISConfirmPostContainer">
+            <h3  id="ISSelectPostHeader">Select the confirmation post</h3>
+            <div id="ISConfirmPostInfo"   class="is-text-container">
+                <p id="ISConfirmPostText"></p>
+            </div>
+            <input type="button" class="is-action-btn" id="ISConfirmPostAction" value="This is confirmation post"> 
+        </div>
+        <div class="is-container"  id="ISFirstStepSuccessContainer">
+            <h3 id="ISSuccessHeader">Confirmation via your social network profile was successful.</h3>
+            <p>You can proceed to the next verification step.</p>
+            <input type="button" class="is-action-btn" id="ISFirstStepEnds" value="Got it!">
+        </div>
+        <div class="is-container"  id="ISErrorContainer">
+            <h3 id="ISErrorHeader">Error!</h3>
+            <div id="ISErrorText"  class="is-text-container"></div>
+            <input type="button" class="is-action-btn" id="ISensTryAgain" value="Try again">
+        </div>
+        <div class="is-container"  id="ISInstructionContainer">
+            <div class="is-text-container">
+                <h3 style="margin: 10px;">Authentication takes place in two stages:</h3>
+                <p>1. Via your social network profile</p>
+                <p>2. Via the ENS system</p>
+                <br>
+                <p>1. To confirm via your social network profile you need to post in the format </p>
+                <p><strong>"DappletsConfirmation yourname.eth"</strong></p>
+                <p>or </p>
+                <p><strong>Your profile name must contain your ENS</strong></p>
+            </div>
+            <input type="button" class="is-action-btn" id="ISLeaveInstruction" value="Got it!">
         </div>
     </div>
-    <div class="is-container"  id="ISActionContainer">
-        <input type="button" class="is-action-btn" id="ISensStart" value="Associate this profile with my ENS">
-        <input type="button" class="is-action-btn" id="ISComplaint" value="I want to complain">
-    </div>
-    <div class="is-container"  id="ISTwoStepsContainer">
-        <input type="button" class="is-action-btn" id="ISFirstStepAction" value="1. Confirm by the social network profile">
-        <input type="button" class="is-action-btn" id="ISSecondStepAction" value="2. Confirm by ENS system" disabled>
-    </div>
-    <div class="is-container"  id="ISAssociateContainer">
-        <div id="ISMatchText"   class="is-text-container">
-            <h3 id="ISMatchName"></h3>
-            <p>This is your name?</p>
-        </div>
-        <input type="button" class="is-action-btn" id="ISensContinue" value="Yes, continue with this name">
-        <input type="button" class="is-action-btn is-alt-btn" id="ISComplaint" value="No, that's not my name">
-    </div>
-    <div class="is-container"  id="ISConfirmPostContainer">
-        <h3>Select the confirmation post</h3>
-        <div id="ISConfirmPostInfo"   class="is-text-container">
-            <p id="ISConfirmPostText"></p>
-        </div>
-        <input type="button" class="is-action-btn" id="ISConfirmPost" value="This is confirmation post"> 
-    </div>
-</div>
-<script src="identity.js"></script>
+    <script src="identity.js"></script>
 </body>
 
 </html>
