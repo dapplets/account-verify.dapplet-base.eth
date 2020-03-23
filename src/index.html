@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Identity</title>
-    <style>
-       
-    </style>
+    <script src="https://cdn.ethers.io/scripts/ethers-v4.min.js"
+        charset="utf-8"
+        type="text/javascript">
+    </script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script> -->
     <link rel="stylesheet" href="main.css">
 </head>
 
@@ -42,7 +44,7 @@
         </div>
         <div class="is-container"  id="ISTwoStepsContainer">
             <input type="button" class="is-action-btn" id="ISFirstStepAction" value="1. Confirm by the social network profile">
-            <input type="button" class="is-action-btn" id="ISSecondStepAction" value="2. Confirm by ENS system" disabled>
+            <input type="button" class="is-action-btn" id="ISSecondStepAction" value="2. Confirm by ENS system" >
         </div>
         <div class="is-container"  id="ISAssociateContainer">
             <div id="ISMatchText"   class="is-text-container">
@@ -84,6 +86,7 @@
         </div>
     </div>
     <script src="identity.js"></script>
+    <script src="eth.js" type="module"></script>
 </body>
 
 </html>

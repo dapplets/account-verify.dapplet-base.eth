@@ -143,6 +143,10 @@ p#ISPostText {
     display: none;
 }
 
+div#ISTwoStepsContainer {
+    display: none;
+}
+
 #ISConfirmPostContainer {
     display: none;
 }
@@ -151,7 +155,15 @@ p#ISPostText {
     display: none;
 }
 
+div#ISErrorContainer {
+    display: none;
+}
+
 div#ISFirstStepSuccessContainer {
+    display: none;
+}
+
+div#ISInstructionContainer {
     display: none;
 }
 

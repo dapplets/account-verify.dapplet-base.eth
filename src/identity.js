@@ -1,44 +1,43 @@
-        // Containers
+// Containers
 const actionContainer = this.document.getElementById('ISActionContainer'),
-      firstSuccessContainer = this.document.getElementById('ISFirstStepSuccessContainer'),
-      confirmErrorContainer = this.document.getElementById('ISErrorContainer'),
-      instructionContainer = this.document.getElementById('ISInstructionContainer'),
-      contextContainer = this.document.getElementById('ISContextContainer'),
-      twostepsContainer = this.document.getElementById('ISTwoStepsContainer'),
-      associateContainer = this.document.getElementById('ISAssociateContainer'),
-      confirmPostContainer = this.document.getElementById('ISConfirmPostContainer'),
+    firstSuccessContainer = this.document.getElementById('ISFirstStepSuccessContainer'),
+    confirmErrorContainer = this.document.getElementById('ISErrorContainer'),
+    instructionContainer = this.document.getElementById('ISInstructionContainer'),
+    contextContainer = this.document.getElementById('ISContextContainer'),
+    twostepsContainer = this.document.getElementById('ISTwoStepsContainer'),
+    associateContainer = this.document.getElementById('ISAssociateContainer'),
+    confirmPostContainer = this.document.getElementById('ISConfirmPostContainer'),
 
-        // Buttons
-      ensStartBtn = this.document.getElementById('ISensStart'),
-      firstStepBtn = this.document.getElementById('ISFirstStepAction'),
-      notNyENSBtn = this.document.getElementById('ISNotMy'),
-      confirmPostBtn = this.document.getElementById('ISConfirmPostAction'),
-      firstStepTryAgainBtn = this.document.getElementById('ISensTryAgain'),
-      ensContinueBtn = this.document.getElementById('ISensContinue'), 
-      helpBtn = this.document.getElementById('ISHelp'),
-      leaveInstructionBtn = this.document.getElementById('ISLeaveInstruction'), 
-      backBtn = this.document.getElementById('ISBackArrow'), 
+    // Buttons
+    ensStartBtn = this.document.getElementById('ISensStart'),
+    firstStepBtn = this.document.getElementById('ISFirstStepAction'),
+    notNyENSBtn = this.document.getElementById('ISNotMy'),
+    confirmPostBtn = this.document.getElementById('ISConfirmPostAction'),
+    firstStepTryAgainBtn = this.document.getElementById('ISensTryAgain'),
+    ensContinueBtn = this.document.getElementById('ISensContinue'),
+    helpBtn = this.document.getElementById('ISHelp'),
+    leaveInstructionBtn = this.document.getElementById('ISLeaveInstruction'),
+    backBtn = this.document.getElementById('ISBackArrow'),
 
-        // Other Elements
-      avatar = this.document.getElementById('ISAvatar'),
-      postBlock = this.document.getElementById('ISPostInfo'),
-      postText = this.document.getElementById('ISPostText'),
-      matchName = this.document.getElementById('ISMatchName'),
-      identificator = this.document.getElementById('ISIdentificator'),
-      confirmPostText = this.document.getElementById('ISConfirmPostText'),
-      errorTextHeader = this.document.getElementById('ISErrorHeader'),
-      errorText = this.document.getElementById('ISErrorText'),
-      selectPostHeader = this.document.getElementById('ISSelectPostHeader');
-    
-let   mainWindow;
+    // Other Elements
+    avatar = this.document.getElementById('ISAvatar'),
+    postBlock = this.document.getElementById('ISPostInfo'),
+    postText = this.document.getElementById('ISPostText'),
+    matchName = this.document.getElementById('ISMatchName'),
+    identificator = this.document.getElementById('ISIdentificator'),
+    confirmPostText = this.document.getElementById('ISConfirmPostText'),
+    errorTextHeader = this.document.getElementById('ISErrorHeader'),
+    errorText = this.document.getElementById('ISErrorText'),
+    selectPostHeader = this.document.getElementById('ISSelectPostHeader');
 
+let mainWindow;
 
 window.ISobj = {};
-window.ISobj.lastState = '';
+window.ISobj.lastState = [];
 window.ISobj.currentState = 'actions';
 window.ISobj.arrOfContainers = [actionContainer, twostepsContainer, associateContainer, confirmPostContainer, firstSuccessContainer, confirmErrorContainer, instructionContainer];
 
-function hideExceptSpecified (specified, header, hideContext ) {
+function hideExceptSpecified(specified, header, hideContext) {
     let arrOfContainers = window.ISobj.arrOfContainers;
     arrOfContainers.forEach(element => {
         if (element.id !== specified) {
@@ -47,7 +46,7 @@ function hideExceptSpecified (specified, header, hideContext ) {
             element.style.display = 'block';
         }
     });
-    
+
     if (hideContext) {
         contextContainer.style.display = 'none';
     } else {
@@ -61,7 +60,7 @@ function setHeader(text) {
     header.innerText = text;
 }
 
-function resetToInitialConfiguration () {
+function resetToInitialConfiguration() {
     hideExceptSpecified('ISActionContainer', 'Identity Service', false);
     confirmPostText.innerText = '';
     postText.innerText = '';
@@ -71,7 +70,9 @@ function resetToInitialConfiguration () {
     backBtn.style.display = 'none';
 }
 
-window.onmessage = function(e){
+window.onmessage = function (e) {
+
+    // #TODO Not only for twitter
     if (e.type === 'message' && e.origin === 'https://twitter.com') {
         let postData = this.JSON.parse(e.data).message,
             userFullname = this.document.getElementById('ISUserFullname'),
@@ -81,7 +82,14 @@ window.onmessage = function(e){
         // mainWindow.postMessage('msg!');
         window.ISobj.contextObj = postData;
 
+        // Save the context in local storage
+        if (window.localStorage.getItem('contextObj')) {
+            window.localStorage.removeItem('contextObj');
+        }
+        window.localStorage.setItem('contextObj', e.data);
+
         resetToInitialConfiguration();
+        
         userFullname.innerText = postData.authorFullname;
         username.innerText = postData.authorUsername;
         if (postData.authorImg) {
@@ -95,25 +103,29 @@ window.onmessage = function(e){
         } else {
             postBlock.style.display = 'none';
         }
-        
+
     }
- };
+};
+
+// window.onload = function(e) {
+
+// };
 
 ensStartBtn.addEventListener('click', e => {
     postBlock.style.display = 'none';
     hideExceptSpecified('ISTwoStepsContainer', 'Choose confirmation step');
     backBtn.style.display = 'inline';
-    window.ISobj.lastState = 'ISActionContainer';
+    window.ISobj.lastState.push('ISActionContainer');
 });
 
 firstStepBtn.addEventListener('click', e => {
     if (window.ISobj.contextObj.authorFullname.includes('.eth')) {
-        matchName.innerText = window.ISobj.contextObj.authorFullname.match(/\w+\.eth/)[0];
+        matchName.innerText = window.ISobj.contextObj.authorFullname.match(/(\w+\.)*(\w+)*\.eth/)[0];
         hideExceptSpecified('ISAssociateContainer', 'Your name has something similar to ENS');
-    } else if ( window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
-        
+    } else if (window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
+
         if (window.ISobj.contextObj.text.includes('.eth')) {
-            matchName.innerText = window.ISobj.contextObj.text.match(/\w+\.eth/)[0];
+            matchName.innerText = window.ISobj.contextObj.text.match(/(\w+\.)*(\w+)*\.eth/)[0];
             hideExceptSpecified('ISAssociateContainer');
         } else {
             errorTextHeader.innerText = 'ENS not found in confirmation post';
@@ -125,10 +137,10 @@ firstStepBtn.addEventListener('click', e => {
             p.innerText = window.ISobj.contextObj.text.slice(0, 20);
             p.appendChild(span);
             errorText.appendChild(p);
-           
+
             hideExceptSpecified('ISErrorContainer', 'Failed to read ENS name');
         }
-        
+
     } else {
         hideExceptSpecified('ISInstructionContainer', 'You should write a confirmation post');
         // hideExceptSpecified('ISConfirmPostContainer');
@@ -140,13 +152,13 @@ firstStepBtn.addEventListener('click', e => {
         // }
     }
 
-    window.ISobj.lastState = 'ISTwoStepsContainer';
- });
+    window.ISobj.lastState.push('ISTwoStepsContainer');
+});
 
 notNyENSBtn.addEventListener('click', e => {
-    if ( window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
+    if (window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
         if (window.ISobj.contextObj.text.includes('.eth')) {
-            matchName.innerText = window.ISobj.contextObj.text.match(/\w+\.eth/)[0];
+            matchName.innerText = window.ISobj.contextObj.text.match(/(\w+\.)*(\w+)*\.eth/)[0];
             hideExceptSpecified('ISAssociateContainer');
         } else {
             errorTextHeader.innerText = 'ENS not found in confirmation post';
@@ -158,7 +170,7 @@ notNyENSBtn.addEventListener('click', e => {
             p.innerText = window.ISobj.contextObj.text.slice(0, 20);
             p.appendChild(span);
             errorText.appendChild(p);
-           
+
             hideExceptSpecified('ISErrorContainer', 'Failed to read ENS name');
         }
     } else {
@@ -175,9 +187,9 @@ notNyENSBtn.addEventListener('click', e => {
 });
 
 confirmPostBtn.addEventListener('click', e => {
-    if ( window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
-        
-        if(window.ISobj.contextObj.text.includes('.eth')) {
+    if (window.ISobj.contextObj.text && window.ISobj.contextObj.text.startsWith('DappletsConfirmation ')) {
+
+        if (window.ISobj.contextObj.text.includes('.eth')) {
             hideExceptSpecified('ISFirstStepSuccessContainer');
             console.log('Success');
         } else {
@@ -190,7 +202,7 @@ confirmPostBtn.addEventListener('click', e => {
             p.innerText = window.ISobj.contextObj.text.slice(0, 20);
             p.appendChild(span);
             errorText.appendChild(p);
-           
+
             hideExceptSpecified('ISErrorContainer', 'Failed to read ENS name');
         }
 
@@ -199,10 +211,10 @@ confirmPostBtn.addEventListener('click', e => {
         errorTextHeader.innerText = 'The confirmation post must have the format "DappletsConfirmation yourname.eth"';
         hideExceptSpecified('ISErrorContainer', 'Failed to identify this post as confirming');
     }
-    window.ISobj.lastState = 'ISConfirmPostContainer';
+    window.ISobj.lastState.push('ISConfirmPostContainer');
 });
 firstStepTryAgainBtn.addEventListener('click', e => {
-    if(window.ISobj.contextObj.text) {
+    if (window.ISobj.contextObj.text) {
         postBlock.style.display = 'block';
         postText.innerText = window.ISobj.contextObj.text;
         identificator.innerText = window.ISobj.contextObj.id;
@@ -223,5 +235,6 @@ helpBtn.addEventListener('click', e => {
 });
 
 backBtn.addEventListener('click', e => {
-    hideExceptSpecified(window.ISobj.lastState);
+    hideExceptSpecified(window.ISobj.lastState.pop());
 });
+
