@@ -1,0 +1,39 @@
+pragma solidity >=0.4.0;
+
+interface ENS {
+
+    function resolver(bytes32 node) external view returns (Resolver);
+    function owner(bytes32 node) external view returns (address);
+}
+
+interface Resolver {
+    function addr(bytes32 node) external view returns (address);
+}
+
+
+
+
+contract Account2ENS {
+
+    mapping(bytes32 => bytes32) account2ens;
+
+    ENS ens =ENS(0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e);
+    
+    event AccountLinked(bytes32 account, bytes32 ensNode);
+
+    function linkAccount(bytes32 account, bytes32 ensNode) public  {
+        address ensOwner = ens.owner(ensNode);
+        assert (ensOwner == msg.sender);
+        account2ens[account] = ensNode;
+        emit AccountLinked(account, ensNode);
+    }
+
+    event ENSaddress (bytes32 node, address addr);
+
+    function resolve(bytes32 node) public returns(address) {
+        Resolver resolver = ens.resolver(node);
+        address addr = resolver.addr(node);
+        emit ENSaddress(node, addr);
+        return addr;
+    }
+}
