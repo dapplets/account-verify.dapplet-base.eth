@@ -17,5 +17,5 @@ export default [{
             //ca: fs.readFileSync('/path/to/ca.pem')
         },
         contentBase: ''
-    })]
+    }), { load: () => console.log('\x1b[35m%s\x1b[0m', `Current registry address: https://localhost:10001/dapplets.json`) }]
 }];
