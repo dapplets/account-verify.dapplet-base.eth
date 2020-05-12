@@ -1,6 +1,6 @@
 {
   "name": "account-verify.dapplet-base.eth",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Display a Verified Account Mark if the account is owned by the ethereum id",
   "main": "lib/index.js",
   "scripts": {
@@ -10,13 +10,13 @@
   "author": "Dapplets Project",
   "license": "MIT",
   "devDependencies": {
-    "@dapplets/dapplet-extension": "^0.1.6",
-    "@rollup/plugin-image": "^2.0.4",
-    "@rollup/plugin-typescript": "^3.0.0",
-    "rollup": "^1.31.0",
+    "@dapplets/dapplet-extension": "^0.2.0",
+    "@rollup/plugin-image": "^2.0.5",
+    "@rollup/plugin-typescript": "^3.1.0",
+    "rollup": "^2.9.1",
     "rollup-plugin-serve": "^1.0.1",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.5"
+    "tslib": "^1.11.2",
+    "typescript": "^3.8.3"
   },
   "dependencies": {}
 }
