@@ -23,7 +23,7 @@ export class ProvePost extends React.Component<IProps, IState> {
       <React.Fragment>
         <p>Publish a post with following text to prove the ownership of the @ethernian account.</p>
         <Message>
-          <p>{message}</p>
+          <p style={{ overflowWrap: 'break-word' }}>{message}</p>
         </Message>
         <Button primary onClick={() => {navigator.clipboard.writeText(message)}}>
           <Icon name='copy' />

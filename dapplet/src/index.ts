@@ -33,17 +33,13 @@ export default class Feature implements IFeature {
                         label: '',
                         exec: (ctx) => {
                             overlay.sendAndListen('profile_select', ctx, {
-                                'sign_prove': (op, msg) => {
-                                    // wallet.sendAndListen('1', ctx, {
-                                    //     rejected: () => me.state = 'ERR',
-                                    //     created: () => {
-                                    //         me.state = 'DEFAULT';
-                                    //         overlay.send('tx_created');
-                                    //     }
-                                    // });
-
-                                    this._currentProve = `test`;
-                                    setTimeout(() => overlay.send('prove_signed', this._currentProve), 3000);
+                                'sign_prove': (op, { type, message }) => {
+                                    wallet.sendAndListen('personal_sign', message, {
+                                        signed: (op, { type, data }) => {
+                                            this._currentProve = data;
+                                            overlay.send('prove_signed', this._currentProve);
+                                        }
+                                    });
                                 }
                             });
                         }
