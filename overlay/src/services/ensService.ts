@@ -17,6 +17,8 @@ export class EnsService {
     }
 
     async getRegistrant(domain: string): Promise<string> {
+        // ToDo: which characters are valid?
+        // ToDo: UTS46 and nameprep
         const name = (domain.lastIndexOf('.eth') === domain.length - 4) ? domain.substr(0, domain.length - 4) : domain;
         const id = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(name.toLowerCase()));
         console.log('ethers', ethers);

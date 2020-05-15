@@ -9,6 +9,7 @@ import { ProveWaiting } from '../components/ProveWaiting';
 import { Header } from '../components/Header';
 import { Profile, dappletInstance } from '../dappletBus';
 import { EnsService } from '../services/ensService';
+import { findEnsNames } from '../helpers';
 
 interface IProps {
   profile: Profile;
@@ -56,7 +57,8 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     const ensService = new EnsService();
 
     const { profile } = this.props;
-    const domainsFromFullname = profile.authorFullname.match(/[^ ]*\.eth/gm) || [];
+    // ToDo: 
+    const domainsFromFullname = findEnsNames(profile.authorFullname);
     const domainFromUsername = `${profile.authorUsername}.eth`;
     const domainsForChecking = [...domainsFromFullname, domainFromUsername];
     const unavailableDomains = await Promise.all(domainsForChecking.map(d => ensService.getRegistrant(d).then(o => ({ name: d, owner: o }))));
