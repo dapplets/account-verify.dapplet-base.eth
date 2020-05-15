@@ -8,6 +8,7 @@ import { ProvePost } from '../components/ProvePost';
 import { ProveWaiting } from '../components/ProveWaiting';
 import { Header } from '../components/Header';
 import { Profile, dappletInstance } from '../dappletBus';
+import { EnsService } from '../services/ensService';
 
 interface IProps {
   profile: Profile;
@@ -25,6 +26,13 @@ interface IState {
   } | null;
   txResult: any;
   proveUrl: string;
+  availableDomains: string[];
+  unavailableDomains: {
+    name: string;
+    owner: string;
+  }[];
+  preferedDomain: string;
+  currentAccount: string;
 }
 
 export class ProfileLinking extends React.Component<IProps, IState> {
@@ -36,8 +44,27 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       stage: Stages.ProfileSelect,
       transaction: null,
       txResult: null,
-      proveUrl: ''
+      proveUrl: '',
+      availableDomains: [],
+      unavailableDomains: [],
+      preferedDomain: 'rinkeby.eth',
+      currentAccount: ''
     }
+  }
+
+  async componentDidMount() {
+    const ensService = new EnsService();
+
+    const { profile } = this.props;
+    const domainsFromFullname = profile.authorFullname.match(/[^ ]*\.eth/gm) || [];
+    const domainFromUsername = `${profile.authorUsername}.eth`;
+    const domainsForChecking = [...domainsFromFullname, domainFromUsername];
+    const unavailableDomains = await Promise.all(domainsForChecking.map(d => ensService.getRegistrant(d).then(o => ({ name: d, owner: o }))));
+
+    const account = await dappletInstance.getAccount();
+    const availableDomains = await ensService.getDomains(account);
+    
+    this.setState({ availableDomains, unavailableDomains, currentAccount: account });
   }
 
   setStage(stage: Stages) {
@@ -86,25 +113,29 @@ export class ProfileLinking extends React.Component<IProps, IState> {
             to post in the format <b>"Dapplet-Confirmation yourname.eth"</b>
             or <b>Your profile name must contain your ENS</b>.</p>
 
-          <p>The following addresses are available for linking in your account: 0xDead...Beef:</p>
+          <p>The following addresses are available for linking in your account: {this.state.currentAccount}:</p>
 
           <Form>
-            {/* <Form.Field>Select addreses to link:</Form.Field> */}
-            <Form.Field><Checkbox label='ethernian.eth' style={{ fontWeight: 800 }} /></Form.Field>
-            <Form.Field><Checkbox label='vitalik.eth' /></Form.Field>
-            <Form.Field><Checkbox label='vitalikbuterin.eth' /></Form.Field>
-            <Form.Field><Checkbox label='buterin.eth' /></Form.Field>
-            <Form.Field><Checkbox label='0xDead...Beef' /></Form.Field>
+            {this.state.availableDomains.map((domain, key) => (
+              <Form.Field key={key}>
+                <Checkbox
+                  label={domain}
+                  style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
+                />
+              </Form.Field>
+            ))}
           </Form>
 
           <br />
 
           <Form>
             <Form.Field>Also there are some addresses which are similar with your username, but are owned by another account:</Form.Field>
-            <Form.Field><Checkbox label='dima.eth (owned by 0xCafe...Babe)' disabled /></Form.Field>
-            <Form.Field><Checkbox label='palchun.eth (owned by 0xCafe...Babe)' disabled /></Form.Field>
+            {this.state.unavailableDomains.map((domain, key) => (
+              <Form.Field key={key}>
+                <Checkbox label={`${domain.name} (${(domain.owner) ? `owned by ${domain.owner}` : 'available'})`} disabled />
+              </Form.Field>
+            ))}
           </Form>
-
         </Segment>
 
         <Button basic>Reset</Button>

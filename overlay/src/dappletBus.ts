@@ -33,6 +33,18 @@ class DappletBus extends Bus {
             message: prove
         });
     }
+
+    async getAccount(): Promise<string> {
+        return new Promise((res, rej) => {
+            this.publish(this._subId.toString(), {
+                type: 'get_account'
+            });
+            this.subscribe('current_account', (data: any) => {
+                this.unsubscribe('current_account');
+                res(data);
+            });
+        });
+    }
 }
 
 const dappletInstance = new DappletBus();

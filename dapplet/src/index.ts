@@ -15,10 +15,11 @@ export default class Feature implements IFeature {
     public config: any; // T_TwitterFeatureConfig;
 
     private _currentProve: string = null;
+    private _currentAddress: string = null;
 
     constructor() {
         const wallet = Core.wallet();
-        const overlay = Core.overlay({ url: 'https://localhost:3000', title: 'Identity Service' });
+        const overlay = Core.overlay({ url: 'https://localhost:3000', title: 'Identity Management' });
         const { badge, button } = this.adapter.widgets;
         const { popup } = this.adapter2.widgets;
 
@@ -30,15 +31,22 @@ export default class Feature implements IFeature {
                         img: ICON_DAPPLET,
                         label: '',
                         exec: (ctx) => {
+                            wallet.sendAndListen('eth_accounts', [], {
+                                result: (op, { type, data }) => {
+                                    this._currentAddress = data[0];
+                                }
+                            });
+
                             overlay.sendAndListen('profile_select', ctx, {
                                 'sign_prove': (op, { type, message }) => {
-                                    wallet.sendAndListen('personal_sign', message, {
-                                        signed: (op, { type, data }) => {
+                                    wallet.sendAndListen('personal_sign', [message, this._currentAddress], {
+                                        result: (op, { type, data }) => {
                                             this._currentProve = data;
                                             overlay.send('prove_signed', this._currentProve);
                                         }
                                     });
-                                }
+                                },
+                                'get_account': () => overlay.send('current_account', this._currentAddress)
                             });
                         }
                     }
@@ -69,7 +77,7 @@ export default class Feature implements IFeature {
                             //if (ctx.authorUsername === "@Ethernian") {
                             //me.setState("HIDDEN");
                             //}
-                        }      
+                        }
                     },
                     "HIDDEN": {
                         hidden: true
