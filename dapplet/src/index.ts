@@ -1,11 +1,9 @@
 import { IFeature } from '@dapplets/dapplet-extension'
-import CHECKED_ICON_SHIELD from './check_circle_shield.svg'
-import CHECKED_ICON_SHIELD_YELLOW from './check_circle_shield_yellow.svg'
-import PICTURE from './picture.png';
-import WARNING from './warning.svg'
-// import CLOSE_ICON from './close_circle.svg'
-// import CHECKED_ICON from './check_circle.svg'
-// import { sayHello } from './helper';
+
+import ICON_DAPPLET from './icons/dapplet.png';
+import ICON_GREEN from './icons/green.svg';
+import ICON_YELLOW from './icons/yellow.svg';
+import ICON_RED from './icons/red.svg';
 
 @Injectable
 export default class Feature implements IFeature {
@@ -29,7 +27,7 @@ export default class Feature implements IFeature {
                 button({
                     initial: "DEFAULT",
                     "DEFAULT": {
-                        img: PICTURE,
+                        img: ICON_DAPPLET,
                         label: '',
                         exec: (ctx) => {
                             overlay.sendAndListen('profile_select', ctx, {
@@ -56,6 +54,44 @@ export default class Feature implements IFeature {
                                 overlay.send('prove_published', `https://twitter.com/${ctx.authorUsername}/status/${ctx.id}`);
                             }
                         }
+                    }
+                })
+            ],
+            TWEET_AVATAR_BADGE: [
+                badge({
+                    initial: "DEFAULT",
+                    "DEFAULT": {
+                        hidden: false,
+                        img: ICON_GREEN,
+                        vertical: "bottom",
+                        horizontal: "left",
+                        init: (ctx, me) => {
+                            //if (ctx.authorUsername === "@Ethernian") {
+                            //me.setState("HIDDEN");
+                            //}
+                        }      
+                    },
+                    "HIDDEN": {
+                        hidden: true
+                    }
+                })
+            ],
+            PROFILE_AVATAR_BADGE: [
+                badge({
+                    initial: "DEFAULT",
+                    "DEFAULT": {
+                        hidden: false,
+                        img: ICON_GREEN,
+                        vertical: "top",
+                        horizontal: "left",
+                        init: (ctx, me) => {
+                            //if (ctx.authorUsername === "@Ethernian") {
+                            //me.setState("HIDDEN");
+                            //}
+                        }
+                    },
+                    "HIDDEN": {
+                        hidden: true
                     }
                 })
             ]
