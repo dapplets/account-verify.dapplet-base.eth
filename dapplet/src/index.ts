@@ -1,13 +1,11 @@
-import { IFeature } from '@dapplets/dapplet-extension'
-
-import ICON_DAPPLET from './icons/dapplet.png';
-import ICON_GREEN from './icons/green.svg';
-import ICON_YELLOW from './icons/yellow.svg';
-import ICON_RED from './icons/red.svg';
-import ICON_LOADING from './icons/loading.svg';
-
 import abi from './abi';
 import ethers from 'ethers';
+import { IFeature } from '@dapplets/dapplet-extension'
+import ICON_DAPPLET from './icons/dapplet.png';
+import ICON_GREEN from './icons/green.svg';
+import ICON_LOADING from './icons/loading.svg';
+// import ICON_YELLOW from './icons/yellow.svg';
+// import ICON_RED from './icons/red.svg';
 
 type Account = {
     domainId: number; // 1 - twitter, 2 - ens
@@ -19,27 +17,20 @@ export default class Feature implements IFeature {
 
     @Inject("twitter-adapter.dapplet-base.eth")
     public adapter: any; // ITwitterAdapter;
-    @Inject("common-adapter.dapplet-base.eth")
-    public adapter2: any; // ITwitterAdapter;
-    public config: any; // T_TwitterFeatureConfig;
 
+    public config: any; // T_TwitterFeatureConfig;
     private _currentProve: string = null;
     private _currentAddress: string = null;
-
     private _contract: ethers.Contract;
-
     private _accounts = new Map<string, Promise<Account[]>>();
 
     constructor() {
         const wallet = Core.wallet();
         const overlay = Core.overlay({ url: 'https://localhost:3000', title: 'Identity Management' });
-        const { badge, button } = this.adapter.widgets;
-        const { popup } = this.adapter2.widgets;
-
         const provider = ethers.getDefaultProvider('rinkeby');
         this._contract = new ethers.Contract('0x3ecb70ec3e63f2c0e11324ae9f1332aa062a85cc', abi, provider);
 
-        console.log('contract', this._contract);
+        const { badge, button } = this.adapter.widgets;
 
         this.config = {
             PROFILE_BUTTON_GROUP: [
