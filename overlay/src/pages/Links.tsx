@@ -4,19 +4,21 @@ import { Icon, Divider, Table, Label, Menu, Button } from 'semantic-ui-react';
 import { Header } from '../components/Header';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
+import { IdentityService, Account } from '../services/identityService';
+import { Profile } from '../dappletBus';
 
 //import './Links.css';
 
 interface IProps {
+  profile: Profile
 }
 
 interface IState {
   redirect: string | null;
   stage: Stages;
-  addresses: {
-    type: string;
-    address: string;
-  }[];
+  accounts: Account[];
+  currentAccount: Account | null;
+  removingAccount: Account | null;
 }
 
 enum Stages {
@@ -26,26 +28,45 @@ enum Stages {
 
 export class Links extends React.Component<IProps, IState> {
 
+  _identityService: IdentityService;
+
   constructor(props: IProps) {
     super(props);
     this.state = {
       redirect: null,
       stage: Stages.Links,
-      addresses: [{
-        type: 'Twitter',
-        address: 'ethernian'
-      }, {
-        type: 'ENS',
-        address: 'ethernian.eth'
-      }, {
-        type: 'Ethereum',
-        address: '0xDead...Beef'
-      }]
+      accounts: [],
+      currentAccount: null,
+      removingAccount: null
     };
+    this._identityService = new IdentityService();
   }
 
   setStage(stage: Stages) {
     this.setState({ stage });
+  }
+
+  async componentDidMount() {
+    const accounts = await this._identityService.getAccounts({
+      domainId: 1,
+      name: this.props.profile.authorUsername.toLowerCase()
+    });
+    this.setState({ accounts });
+  }
+
+  private _domainIdToName(domainId: number) {
+    const map = [undefined, 'Twitter', 'ENS'];
+    return map[domainId] || 'Unknown';
+  }
+
+  private async _unlinkAccount(removingAccount: Account) {
+    const currentAccount: Account = {
+      domainId: 1,
+      name: this.props.profile.authorUsername.toLowerCase()
+    };
+    this.setState({ currentAccount, removingAccount });
+    this.setStage(Stages.TxWaiting);
+    //await this._identityService.removeAccount(currentAccount, removingAccount);
   }
 
   render() {
@@ -67,14 +88,6 @@ export class Links extends React.Component<IProps, IState> {
           onBack={() => this.setState({ redirect: '/' })}
         />
 
-        <p>
-
-        </p>
-        {/* 
-        <a href="#" onClick={() => window.open('https://twitter.com/ethernian', '_blank')}><Icon name='twitter' />ethernian</a><br />
-        <a href="#" onClick={() => window.open('https://ethernian.eth', '_blank')}><Icon name='linkify' />ethernian.eth</a><br />
-        <a href="#" onClick={() => window.open('https://ethernian.eth', '_blank')}><Icon name='ethereum' />0xDead...Beef</a><br /> */}
-
         <Table unstackable>
           <Table.Header>
             <Table.Row>
@@ -85,12 +98,12 @@ export class Links extends React.Component<IProps, IState> {
           </Table.Header>
 
           <Table.Body>
-            {this.state.addresses.map((a, key) => (
+            {this.state.accounts.map((a, key) => (
               <Table.Row key={key}>
-                <Table.Cell>{a.type}</Table.Cell>
-                <Table.Cell>{a.address}</Table.Cell>
+                <Table.Cell>{this._domainIdToName(a.domainId)}</Table.Cell>
+                <Table.Cell>{a.name}</Table.Cell>
                 <Table.Cell>
-                  <Button size='mini' onClick={() => this.setStage(Stages.TxWaiting)}>Unlink</Button>
+                  <Button size='mini' onClick={() => this._unlinkAccount(a)}>Unlink</Button>
                 </Table.Cell>
               </Table.Row>
             ))}
@@ -110,6 +123,10 @@ export class Links extends React.Component<IProps, IState> {
         />
         <TxWaiting
           type='transaction'
+          transaction2={{
+            currentAccount: this.state.currentAccount,
+            removingAccount: this.state.removingAccount
+          }}
           onSuccessOk={() => this.setStage(Stages.Links)}
           onFailureBack={() => this.setStage(Stages.Links)}
         />

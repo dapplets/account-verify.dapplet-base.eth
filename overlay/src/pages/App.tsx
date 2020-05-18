@@ -43,7 +43,7 @@ export class App extends React.Component<IProps, IState> {
                 <ProfileLinking profile={this.state.profile} />
               </Route>
               <Route path="/links">
-                <Links />
+                <Links profile={this.state.profile} />
               </Route>
             </Switch>
         </Router>

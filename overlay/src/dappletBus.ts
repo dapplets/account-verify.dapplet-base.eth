@@ -49,6 +49,20 @@ class DappletBus extends Bus {
             });
         });
     }
+
+    async sendTransaction(tx: any): Promise<string> {
+        return new Promise((res, rej) => {
+            this.publish(this._subId.toString(), {
+                type: 'send_transaction',
+                message: tx
+            });
+            this.subscribe('transaction_result', (txHash: any) => {
+                this.unsubscribe('transaction_result');
+                res(txHash);
+                // ToDo: add reject call
+            });
+        });
+    }
 }
 
 const dappletInstance = new DappletBus();

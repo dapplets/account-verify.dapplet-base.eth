@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { Segment, Loader, Button } from 'semantic-ui-react';
 import { dappletInstance } from '../dappletBus';
+import { IdentityService } from '../services/identityService';
 //import './TxWaiting.css';
 
 interface IProps {
@@ -13,6 +14,7 @@ interface IProps {
   transaction?: {
     message: string;
   } | null;
+  transaction2? : any;
 }
 
 interface IState {
@@ -35,6 +37,13 @@ export class TxWaiting extends React.Component<IProps, IState> {
   componentDidMount() {
     if (this.props.transaction) {
       dappletInstance.signProve(this.props.transaction.message)
+        .then((result) => {
+          this.setState({ result });
+          this.onSuccess();
+        });
+    } else if (this.props.transaction2) {
+      const identityService = new IdentityService();
+      identityService.removeAccount(this.props.transaction2.currentAccount, this.props.transaction2.removingAccount)
         .then((result) => {
           this.setState({ result });
           this.onSuccess();

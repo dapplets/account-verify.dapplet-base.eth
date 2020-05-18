@@ -28,7 +28,7 @@ export default class Feature implements IFeature {
         const wallet = Core.wallet();
         const overlay = Core.overlay({ url: 'https://localhost:3000', title: 'Identity Management' });
         const provider = ethers.getDefaultProvider('rinkeby');
-        this._contract = new ethers.Contract('0x3ecb70ec3e63f2c0e11324ae9f1332aa062a85cc', abi, provider);
+        this._contract = new ethers.Contract('0x78E2ef829b573BC814A3C29630717548AfB2186D', abi, provider);
 
         const { badge, button } = this.adapter.widgets;
 
@@ -55,7 +55,14 @@ export default class Feature implements IFeature {
                                         }
                                     });
                                 },
-                                'get_account': () => overlay.send('current_account', this._currentAddress)
+                                'get_account': () => overlay.send('current_account', this._currentAddress),
+                                'send_transaction': (op, { type, message }) => {
+                                    wallet.sendAndListen('eth_sendTransaction', [message], {
+                                        result: (op, { type, data }) => {
+                                            overlay.send('transaction_result', data);
+                                        }
+                                    });
+                                }
                             });
                         }
                     }
