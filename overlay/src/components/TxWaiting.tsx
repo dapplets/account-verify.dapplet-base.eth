@@ -34,11 +34,11 @@ export class TxWaiting extends React.Component<IProps, IState> {
 
   componentDidMount() {
     if (this.props.transaction) {
-      dappletInstance.signProve(this.props.transaction.message);
-      dappletInstance.onProveSigned((result) => {
-        this.setState({ result });
-        this.onSuccess();
-      });
+      dappletInstance.signProve(this.props.transaction.message)
+        .then((result) => {
+          this.setState({ result });
+          this.onSuccess();
+        });
     }
   }
 

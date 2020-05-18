@@ -19,18 +19,21 @@ class DappletBus extends Bus {
         });
     }
 
-    onProveSigned(callback: (prove: SignedProve) => void) {
-        this.subscribe('prove_signed', callback);
-    }
-
     onProvePublished(callback: (proveUrl: string) => void) {
         this.subscribe('prove_published', callback);
     }
 
-    signProve(prove: UnsignedProve) {
-        this.publish(this._subId.toString(), {
-            type: 'sign_prove',
-            message: prove
+    async signProve(prove: UnsignedProve): Promise<SignedProve> {
+        return new Promise((res, rej) => {
+            this.publish(this._subId.toString(), {
+                type: 'sign_prove',
+                message: prove
+            });
+            this.subscribe('prove_signed', (data: any) => {
+                this.unsubscribe('prove_signed');
+                res(data);
+                // ToDo: add reject call
+            });
         });
     }
 
@@ -42,6 +45,7 @@ class DappletBus extends Bus {
             this.subscribe('current_account', (data: any) => {
                 this.unsubscribe('current_account');
                 res(data);
+                // ToDo: add reject call
             });
         });
     }
