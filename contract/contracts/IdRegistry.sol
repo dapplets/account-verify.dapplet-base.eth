@@ -18,7 +18,20 @@ contract IdRegistry {
     }
     
     function getAccounts(Account memory account) public view returns (Account[] memory) {
-        bytes32 key = keccak256(abi.encodePacked(account.domainId, account.name));
-        return accounts[key];
+        return accounts[keccak256(abi.encodePacked(account.domainId, account.name))];
+    }
+    
+    function removeAccount(Account memory oldAccount, Account memory newAccount) public {
+        bytes32 oldKey = keccak256(abi.encodePacked(oldAccount.domainId, oldAccount.name));
+        bytes32 newKey = keccak256(abi.encodePacked(newAccount.domainId, newAccount.name));
+        
+        for (uint i = 0; i < accounts[oldKey].length; ++i) {
+            bytes32 removeKey = keccak256(abi.encodePacked(accounts[oldKey][i].domainId, accounts[oldKey][i].name));
+            if (removeKey == newKey) {
+                accounts[oldKey][i] = accounts[oldKey][accounts[oldKey].length - 1];
+                accounts[oldKey].pop();
+                delete accounts[removeKey];
+            }
+        }
     }
 }
