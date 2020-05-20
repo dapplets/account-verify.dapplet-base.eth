@@ -1,13 +1,13 @@
 {
     "hostnames": {
         "twitter.com": {
-            "account-verify.dapplet-base.eth": "0.0.3"
+            "account-verify.dapplet-base.eth": "0.0.4"
         }
     },
     "modules": {
         "account-verify.dapplet-base.eth": {
             "default": {
-                "0.0.3": "manifest.json"
+                "0.0.4": "manifest.json"
             }
         }
     }
