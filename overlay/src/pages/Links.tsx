@@ -4,6 +4,8 @@ import { Icon, Divider, Table, Label, Menu, Button, Loader } from 'semantic-ui-r
 import { Header } from '../components/Header';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
+import { TxFailure } from '../components/TxFailure';
+import { TxSuccess } from '../components/TxSuccess';
 import { IdentityService, Account } from '../services/identityService';
 import { Profile } from '../dappletBus';
 
@@ -137,10 +139,7 @@ export class Links extends React.Component<IProps, IState> {
           title='My accounts'
           onBack={() => this.setStage(Stages.Links)}
         />
-        <TxWaiting
-          type='transaction'
-          stage='waiting'
-        />
+        <TxWaiting type='transaction' />
       </React.Fragment>
     );
   }
@@ -152,9 +151,8 @@ export class Links extends React.Component<IProps, IState> {
           title='My accounts'
           onBack={() => this.setStage(Stages.Links)}
         />
-        <TxWaiting
+        <TxSuccess
           type='transaction'
-          stage='success'
           onSuccessOk={() => this.setState({ redirect: '/' })}
         />
       </React.Fragment>
@@ -168,9 +166,8 @@ export class Links extends React.Component<IProps, IState> {
           title='My accounts'
           onBack={() => this.setStage(Stages.Links)}
         />
-        <TxWaiting
+        <TxFailure
           type='transaction'
-          stage='failure'
           onFailureBack={() => this.setState({ redirect: '/' })}
         />
       </React.Fragment>

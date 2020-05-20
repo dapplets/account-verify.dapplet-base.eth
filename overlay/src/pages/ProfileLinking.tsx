@@ -4,6 +4,7 @@ import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } fr
 import { Icon, Card, Segment, Sticky, Menu, Divider, Button, Checkbox, Form, Loader } from 'semantic-ui-react';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
+import { TxFailure } from '../components/TxFailure';
 import { ProvePost } from '../components/ProvePost';
 //import { ProveWaiting } from '../components/ProveWaiting';
 import { Header } from '../components/Header';
@@ -206,7 +207,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxWaiting type='sign' stage='waiting' />
+          <TxWaiting type='sign' />
         </Segment>
       </React.Fragment>
     );
@@ -221,7 +222,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxWaiting type='sign' stage='failure' />
+          <TxFailure type='sign' />
         </Segment>
       </React.Fragment>
     );
@@ -251,7 +252,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxWaiting type='transaction' stage='waiting' />
+          <TxWaiting type='transaction' />
         </Segment>
       </React.Fragment>
     );
@@ -266,7 +267,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxWaiting type='transaction' stage='failure' />
+          <TxFailure type='transaction'/>
         </Segment>
       </React.Fragment>
     );
