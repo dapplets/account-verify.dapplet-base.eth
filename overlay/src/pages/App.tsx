@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 import './App.css';
 import { Home } from './Home';
 import { ProfileLinking } from './ProfileLinking';
@@ -34,7 +34,7 @@ export class App extends React.Component<IProps, IState> {
 
     return (
       <div className="App-container">
-        <Router>
+        <HashRouter>
           <Switch>
             <Route exact path="/">
               <Home profile={this.state.profile} />
@@ -46,7 +46,7 @@ export class App extends React.Component<IProps, IState> {
               <Links profile={this.state.profile} />
             </Route>
           </Switch>
-        </Router>
+        </HashRouter>
       </div>
     );
   }
