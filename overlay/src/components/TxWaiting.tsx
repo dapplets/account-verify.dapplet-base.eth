@@ -15,6 +15,7 @@ interface IProps {
     message: string;
   } | null;
   transaction2? : any;
+  stage?: 'waiting' | 'success' | 'failure';
 }
 
 interface IState {
@@ -30,17 +31,21 @@ export class TxWaiting extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = { stage: Stages.Waiting, result: null };
-    //setTimeout(() => this.onSuccess(), 10000);
+    if (this.props.stage) {
+      const map = {
+        'waiting': Stages.Waiting,
+        'success': Stages.Success,
+        'failure': Stages.Failure
+      };
+      this.state = { stage: map[this.props.stage], result: null };
+    } else {
+      this.state = { stage: Stages.Waiting, result: null };
+    }
   }
 
   componentDidMount() {
     if (this.props.transaction) {
-      dappletInstance.signProve(this.props.transaction.message)
-        .then((result) => {
-          this.setState({ result });
-          this.onSuccess();
-        });
+      
     } else if (this.props.transaction2) {
       const identityService = new IdentityService();
       identityService.removeAccount(this.props.transaction2.currentAccount, this.props.transaction2.removingAccount)

@@ -20,10 +20,10 @@ export class IdentityService {
         return this._contract.getAccounts(account);
     }
 
-    // async addAccount(oldAccount: Account, newAccount: Account) {
-    //     const tx = await this._contract.addAccount(oldAccount, newAccount);
-    //     await tx.wait();
-    // }
+    async addAccount(oldAccount: Account, newAccount: Account) {
+        const tx = await this._contract.addAccount(oldAccount, newAccount);
+        await tx.wait();
+    }
 
     async removeAccount(oldAccount: Account, newAccount: Account) {
         const tx = await this._contract.removeAccount(oldAccount, newAccount);

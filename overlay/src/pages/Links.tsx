@@ -127,8 +127,8 @@ export class Links extends React.Component<IProps, IState> {
             currentAccount: this.state.currentAccount,
             removingAccount: this.state.removingAccount
           }}
-          onSuccessOk={() => this.setStage(Stages.Links)}
-          onFailureBack={() => this.setStage(Stages.Links)}
+          onSuccessOk={() => this.setState({ redirect: '/' })}
+          onFailureBack={() => this.setState({ redirect: '/' })}
         />
       </React.Fragment>
     );

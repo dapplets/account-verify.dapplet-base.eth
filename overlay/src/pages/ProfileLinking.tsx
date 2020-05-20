@@ -5,18 +5,26 @@ import { Icon, Card, Segment, Sticky, Menu, Divider, Button, Checkbox, Form } fr
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
 import { ProvePost } from '../components/ProvePost';
-import { ProveWaiting } from '../components/ProveWaiting';
+//import { ProveWaiting } from '../components/ProveWaiting';
 import { Header } from '../components/Header';
 import { Profile, dappletInstance } from '../dappletBus';
 import { EnsService } from '../services/ensService';
 import { findEnsNames } from '../helpers';
+import { IdentityService } from '../services/identityService';
 
 interface IProps {
   profile: Profile;
 }
 
 enum Stages {
-  ProfileSelect, TxWaiting, ProvePost, ProveWaiting
+  ProfileSelect,
+  SignWaiting,
+  SignSuccess,
+  SignFailure,
+  ProvePost,
+  TxWaiting,
+  TxFailure,
+  SuccessLinking
 }
 
 interface IState {
@@ -25,13 +33,14 @@ interface IState {
   transaction: {
     message: string;
   } | null;
-  txResult: any;
+  signedProve: string;
   proveUrl: string;
   availableDomains: string[];
   unavailableDomains: {
     name: string;
     owner: string;
   }[];
+  selectedDomains: string[];
   preferedDomain: string;
   currentAccount: string;
 }
@@ -44,10 +53,11 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       redirect: null,
       stage: Stages.ProfileSelect,
       transaction: null,
-      txResult: null,
+      signedProve: '',
       proveUrl: '',
       availableDomains: [],
       unavailableDomains: [],
+      selectedDomains: [],
       preferedDomain: 'rinkeby.eth',
       currentAccount: ''
     }
@@ -65,7 +75,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
 
     const account = await dappletInstance.getAccount();
     const availableDomains = await ensService.getDomains(account);
-    
+
     this.setState({ availableDomains, unavailableDomains, currentAccount: account });
   }
 
@@ -73,13 +83,30 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     this.setState({ stage });
   }
 
-  sendTransaction() {
-    this.setState({
-      transaction: {
-        message: "ethernian.eth"
-      },
-      stage: Stages.TxWaiting
-    });
+  async signProve() {
+    this.setStage(Stages.SignWaiting);
+    try {
+      const selectedDomain = this.state.selectedDomains[0].toLowerCase();
+      const signedProve = await dappletInstance.signProve(selectedDomain);
+      this.setState({ signedProve });
+      this.setStage(Stages.ProvePost);
+      dappletInstance.onProvePublished(async proveUrl => {
+        this.setState({ proveUrl });
+        const identityService = new IdentityService();
+        const currentAccount = { domainId: 1, name: this.props.profile.authorUsername.toLowerCase() };
+        const newAccount = { domainId: 2, name: selectedDomain };
+        this.setStage(Stages.TxWaiting);
+
+        try {
+          const tx = await identityService.addAccount(currentAccount, newAccount);
+          this.setStage(Stages.SuccessLinking);
+        } catch (err) {
+          this.setStage(Stages.TxFailure);
+        }
+      });
+    } catch (err) {
+      this.setStage(Stages.SignFailure);
+    }
   }
 
   render() {
@@ -89,9 +116,12 @@ export class ProfileLinking extends React.Component<IProps, IState> {
 
     switch (stage) {
       case Stages.ProfileSelect: return this.renderProfileSelect();
-      case Stages.TxWaiting: return this.renderTxWaiting();
+      case Stages.SignWaiting: return this.renderSignWaiting();
+      case Stages.SignFailure: return this.renderSignFailure();
       case Stages.ProvePost: return this.renderProvePost();
-      case Stages.ProveWaiting: return this.renderProveWaiting();
+      case Stages.TxWaiting: return this.renderTxWaiting();
+      case Stages.TxFailure: return this.renderTxFailure();
+      case Stages.SuccessLinking: return this.renderSuccessLinking();
     }
   }
 
@@ -123,6 +153,14 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                 <Checkbox
                   label={domain}
                   style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
+                  checked={this.state.selectedDomains.includes(domain)}
+                  onChange={(e, data) => {
+                    if (data.checked) {
+                      this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
+                    } else {
+                      this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
+                    }
+                  }}
                 />
               </Form.Field>
             ))}
@@ -140,8 +178,57 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           </Form>
         </Segment>
 
-        <Button basic>Reset</Button>
-        <Button primary onClick={() => this.sendTransaction()}>Continue</Button>
+        <Button basic onClick={() => this.setState({ selectedDomains: [] })}>Reset</Button>
+        <Button
+          primary
+          onClick={() => this.signProve()}
+          disabled={this.state.selectedDomains.length === 0}
+        >Continue</Button>
+      </React.Fragment>
+    );
+  }
+
+  renderSignWaiting() {
+    return (
+      <React.Fragment>
+        <Header
+          title='Profile Linking'
+          subtitle='Step 2 of 4: Message Signing'
+          onBack={() => this.setStage(Stages.ProfileSelect)}
+        />
+        <Segment>
+          <TxWaiting type='sign' stage='waiting' />
+        </Segment>
+      </React.Fragment>
+    );
+  }
+
+  renderSignFailure() {
+    return (
+      <React.Fragment>
+        <Header
+          title='Profile Linking'
+          subtitle='Step 2 of 4: Message Signing'
+          onBack={() => this.setStage(Stages.ProfileSelect)}
+        />
+        <Segment>
+          <TxWaiting type='sign' stage='failure' />
+        </Segment>
+      </React.Fragment>
+    );
+  }
+
+  renderProvePost() {
+    return (
+      <React.Fragment>
+        <Header
+          title='Profile Linking'
+          subtitle='Step 3 of 4: Prove Publishing'
+          onBack={() => this.setStage(Stages.ProfileSelect)}
+        />
+        <Segment>
+          <ProvePost message={this.state.signedProve} />
+        </Segment>
       </React.Fragment>
     );
   }
@@ -151,57 +238,68 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       <React.Fragment>
         <Header
           title='Profile Linking'
-          subtitle='Step 2 of 4: Message Signing'
+          subtitle='Step 4 of 4: Account Registration'
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxWaiting
-            type='sign'
-            transaction={this.state.transaction}
-            onSuccess={(r) => (this.setState({ txResult: r }), this.setStage(Stages.ProvePost))}
-          />
+          <TxWaiting type='transaction' stage='waiting' />
         </Segment>
       </React.Fragment>
     );
   }
 
-  renderProvePost() {
-    dappletInstance.onProvePublished(proveUrl => {
-      this.setState({ proveUrl });
-      this.setStage(Stages.ProveWaiting);
-    });
-
+  renderTxFailure() {
     return (
       <React.Fragment>
         <Header
           title='Profile Linking'
-          subtitle='Step 3 of 4: Prove Publishing'
+          subtitle='Step 4 of 4: Account Registration'
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <ProvePost message={this.state.txResult} />
+          <TxWaiting type='transaction' stage='failure' />
         </Segment>
       </React.Fragment>
     );
   }
 
-  renderProveWaiting() {
+  renderSuccessLinking() {
     return (
       <React.Fragment>
         <Header
           title='Profile Linking'
-          subtitle='Step 4 of 4: Prove Validating'
-          onBack={() => this.setStage(Stages.ProvePost)}
+          subtitle='Step 4 of 4: Account Registration'
+          onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <ProveWaiting
-            profile={this.props.profile}
-            proveUrl={this.state.proveUrl}
-            onRepost={() => this.setStage(Stages.ProvePost)}
-            onGotIt={() => this.setState({ redirect: '/' })}
-          />
+          <p>Congratulations! You have linked your account to your ENS name.</p>
         </Segment>
+
+        <Button
+          primary
+          onClick={() => this.setState({ redirect: '/' })}
+        >Got it</Button>
       </React.Fragment>
     );
   }
+
+  // renderProveWaiting() {
+  //   return (
+  //     <React.Fragment>
+  //       <Header
+  //         title='Profile Linking'
+  //         subtitle='Step 4 of 4: Prove Validating'
+  //         onBack={() => this.setStage(Stages.ProvePost)}
+  //       />
+  //       <Segment>
+  //         <ProveWaiting
+  //           profile={this.props.profile}
+  //           proveUrl={this.state.proveUrl}
+  //           onRepost={() => this.setStage(Stages.ProvePost)}
+  //           onGotIt={() => this.setState({ redirect: '/' })}
+  //         />
+  //       </Segment>
+  //     </React.Fragment>
+  //   );
+  // }
 }
