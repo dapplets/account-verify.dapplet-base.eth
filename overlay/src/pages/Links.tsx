@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Icon, Divider, Table, Label, Menu, Button } from 'semantic-ui-react';
+import { Icon, Divider, Table, Label, Menu, Button, Loader } from 'semantic-ui-react';
 import { Header } from '../components/Header';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
@@ -17,13 +17,14 @@ interface IState {
   redirect: string | null;
   stage: Stages;
   accounts: Account[];
-  currentAccount: Account | null;
-  removingAccount: Account | null;
+  loading: boolean;
 }
 
 enum Stages {
   Links,
-  TxWaiting
+  TxWaiting,
+  TxSuccess,
+  TxFailure
 }
 
 export class Links extends React.Component<IProps, IState> {
@@ -36,8 +37,7 @@ export class Links extends React.Component<IProps, IState> {
       redirect: null,
       stage: Stages.Links,
       accounts: [],
-      currentAccount: null,
-      removingAccount: null
+      loading: true
     };
     this._identityService = new IdentityService();
   }
@@ -51,7 +51,7 @@ export class Links extends React.Component<IProps, IState> {
       domainId: 1,
       name: this.props.profile.authorUsername.toLowerCase()
     });
-    this.setState({ accounts });
+    this.setState({ accounts, loading: false });
   }
 
   private _domainIdToName(domainId: number) {
@@ -64,9 +64,16 @@ export class Links extends React.Component<IProps, IState> {
       domainId: 1,
       name: this.props.profile.authorUsername.toLowerCase()
     };
-    this.setState({ currentAccount, removingAccount });
+
     this.setStage(Stages.TxWaiting);
-    //await this._identityService.removeAccount(currentAccount, removingAccount);
+    const identityService = new IdentityService();
+
+    try {
+      await identityService.removeAccount(currentAccount, removingAccount);
+      this.setStage(Stages.TxSuccess);
+    } catch (err) {
+      this.setStage(Stages.TxFailure);
+    }
   }
 
   render() {
@@ -77,6 +84,8 @@ export class Links extends React.Component<IProps, IState> {
     switch (stage) {
       case Stages.Links: return this.renderLinks();
       case Stages.TxWaiting: return this.renderTxWaiting();
+      case Stages.TxSuccess: return this.renderTxSuccess();
+      case Stages.TxFailure: return this.renderTxFailure();
     }
   }
 
@@ -88,28 +97,35 @@ export class Links extends React.Component<IProps, IState> {
           onBack={() => this.setState({ redirect: '/' })}
         />
 
-        <Table unstackable>
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>Type</Table.HeaderCell>
-              <Table.HeaderCell>Address</Table.HeaderCell>
-              <Table.HeaderCell>Actions</Table.HeaderCell>
-            </Table.Row>
-          </Table.Header>
-
-          <Table.Body>
-            {this.state.accounts.map((a, key) => (
-              <Table.Row key={key}>
-                <Table.Cell>{this._domainIdToName(a.domainId)}</Table.Cell>
-                <Table.Cell>{a.name}</Table.Cell>
-                <Table.Cell>
-                  <Button size='mini' onClick={() => this._unlinkAccount(a)}>Unlink</Button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-
-        </Table>
+        {(this.state.loading) ? (<Loader active inline='centered'>Loading</Loader>) : (
+          (this.state.accounts.length === 0) ? (
+            <p>You have no linked accounts yet.</p>
+          ) : (
+              <Table unstackable>
+                <Table.Header>
+                  <Table.Row>
+                    <Table.HeaderCell>Type</Table.HeaderCell>
+                    <Table.HeaderCell>Address</Table.HeaderCell>
+                    <Table.HeaderCell>Actions</Table.HeaderCell>
+                  </Table.Row>
+                </Table.Header>
+  
+                <Table.Body>
+                  {this.state.accounts.map((a, key) => (
+                    <Table.Row key={key}>
+                      <Table.Cell>{this._domainIdToName(a.domainId)}</Table.Cell>
+                      <Table.Cell>{a.name}</Table.Cell>
+                      <Table.Cell>
+                        <Button size='mini' onClick={() => this._unlinkAccount(a)}>Unlink</Button>
+                      </Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+  
+              </Table >
+            )
+        )}
+        
       </React.Fragment>
     );
   }
@@ -123,11 +139,38 @@ export class Links extends React.Component<IProps, IState> {
         />
         <TxWaiting
           type='transaction'
-          transaction2={{
-            currentAccount: this.state.currentAccount,
-            removingAccount: this.state.removingAccount
-          }}
+          stage='waiting'
+        />
+      </React.Fragment>
+    );
+  }
+
+  renderTxSuccess() {
+    return (
+      <React.Fragment>
+        <Header
+          title='My accounts'
+          onBack={() => this.setStage(Stages.Links)}
+        />
+        <TxWaiting
+          type='transaction'
+          stage='success'
           onSuccessOk={() => this.setState({ redirect: '/' })}
+        />
+      </React.Fragment>
+    );
+  }
+
+  renderTxFailure() {
+    return (
+      <React.Fragment>
+        <Header
+          title='My accounts'
+          onBack={() => this.setStage(Stages.Links)}
+        />
+        <TxWaiting
+          type='transaction'
+          stage='failure'
           onFailureBack={() => this.setState({ redirect: '/' })}
         />
       </React.Fragment>

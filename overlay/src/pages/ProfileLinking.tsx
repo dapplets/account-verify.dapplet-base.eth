@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 //import './ProfileLinking.css';
-import { Icon, Card, Segment, Sticky, Menu, Divider, Button, Checkbox, Form } from 'semantic-ui-react';
+import { Icon, Card, Segment, Sticky, Menu, Divider, Button, Checkbox, Form, Loader } from 'semantic-ui-react';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
 import { ProvePost } from '../components/ProvePost';
@@ -43,6 +43,7 @@ interface IState {
   selectedDomains: string[];
   preferedDomain: string;
   currentAccount: string;
+  loading: boolean;
 }
 
 export class ProfileLinking extends React.Component<IProps, IState> {
@@ -58,8 +59,9 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       availableDomains: [],
       unavailableDomains: [],
       selectedDomains: [],
-      preferedDomain: 'rinkeby.eth',
-      currentAccount: ''
+      preferedDomain: '',
+      currentAccount: '',
+      loading: true
     }
   }
 
@@ -76,7 +78,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     const account = await dappletInstance.getAccount();
     const availableDomains = await ensService.getDomains(account);
 
-    this.setState({ availableDomains, unavailableDomains, currentAccount: account });
+    this.setState({ availableDomains, unavailableDomains, currentAccount: account, loading: false });
   }
 
   setStage(stage: Stages) {
@@ -98,7 +100,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
         this.setStage(Stages.TxWaiting);
 
         try {
-          const tx = await identityService.addAccount(currentAccount, newAccount);
+          await identityService.addAccount(currentAccount, newAccount);
           this.setStage(Stages.SuccessLinking);
         } catch (err) {
           this.setStage(Stages.TxFailure);
@@ -147,35 +149,42 @@ export class ProfileLinking extends React.Component<IProps, IState> {
 
           <p>The following addresses are available for linking in your account: {this.state.currentAccount}:</p>
 
-          <Form>
-            {this.state.availableDomains.map((domain, key) => (
-              <Form.Field key={key}>
-                <Checkbox
-                  label={domain}
-                  style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
-                  checked={this.state.selectedDomains.includes(domain)}
-                  onChange={(e, data) => {
-                    if (data.checked) {
-                      this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
-                    } else {
-                      this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
-                    }
-                  }}
-                />
-              </Form.Field>
-            ))}
-          </Form>
+          {(this.state.loading) ? (<Loader inline active size='mini' />) : (
+            (this.state.unavailableDomains.length > 0) ? (
+            <Form>
+              {this.state.availableDomains.map((domain, key) => (
+                <Form.Field key={key}>
+                  <Checkbox
+                    label={domain}
+                    style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
+                    checked={this.state.selectedDomains.includes(domain)}
+                    onChange={(e, data) => {
+                      if (data.checked) {
+                        this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
+                      } else {
+                        this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
+                      }
+                    }}
+                  />
+                </Form.Field>
+              ))}
+            </Form>
+            ) : (<p>You do not have your own ens names. Register at least one to continue.</p>)
+          )}
 
-          <br />
-
-          <Form>
-            <Form.Field>Also there are some addresses which are similar with your username, but are owned by another account:</Form.Field>
-            {this.state.unavailableDomains.map((domain, key) => (
-              <Form.Field key={key}>
-                <Checkbox label={`${domain.name} (${(domain.owner) ? `owned by ${domain.owner}` : 'available'})`} disabled />
-              </Form.Field>
-            ))}
-          </Form>
+          {(this.state.unavailableDomains.length > 0) ? (
+            <React.Fragment>
+              <br />
+              <Form>
+                <Form.Field>Also there are some addresses which are similar with your username, but are owned by another account:</Form.Field>
+                {this.state.unavailableDomains.map((domain, key) => (
+                  <Form.Field key={key}>
+                    <Checkbox label={`${domain.name} (${(domain.owner) ? `owned by ${domain.owner}` : 'available'})`} disabled />
+                  </Form.Field>
+                ))}
+              </Form>
+            </React.Fragment>
+          ) : null}
         </Segment>
 
         <Button basic onClick={() => this.setState({ selectedDomains: [] })}>Reset</Button>

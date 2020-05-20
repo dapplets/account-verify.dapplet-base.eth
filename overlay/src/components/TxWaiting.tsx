@@ -47,12 +47,7 @@ export class TxWaiting extends React.Component<IProps, IState> {
     if (this.props.transaction) {
       
     } else if (this.props.transaction2) {
-      const identityService = new IdentityService();
-      identityService.removeAccount(this.props.transaction2.currentAccount, this.props.transaction2.removingAccount)
-        .then((result) => {
-          this.setState({ result });
-          this.onSuccess();
-        });
+      
     }
   }
 
@@ -94,7 +89,7 @@ export class TxWaiting extends React.Component<IProps, IState> {
       </React.Fragment> :
       <React.Fragment>
         <p>Waiting of the transaction confirmation in your wallet.</p>
-        <Loader active inline='centered'>Mining</Loader>
+        <Loader active inline='centered'>Waiting</Loader>
       </React.Fragment>;
 
     return (
