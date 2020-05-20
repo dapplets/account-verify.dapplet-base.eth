@@ -1,17 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-//import './ProfileLinking.css';
-import { Icon, Card, Segment, Sticky, Menu, Divider, Button, Checkbox, Form, Loader } from 'semantic-ui-react';
+import { Redirect } from "react-router-dom";
+import { Segment, Button, Checkbox, Form, Loader } from 'semantic-ui-react';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
 import { ProvePost } from '../components/ProvePost';
-//import { ProveWaiting } from '../components/ProveWaiting';
 import { Header } from '../components/Header';
 import { Profile, dappletInstance } from '../dappletBus';
 import { EnsService } from '../services/ensService';
 import { findEnsNames } from '../helpers';
 import { IdentityService } from '../services/identityService';
+
+//import './ProfileLinking.css';
 
 interface IProps {
   profile: Profile;
@@ -152,24 +152,24 @@ export class ProfileLinking extends React.Component<IProps, IState> {
 
           {(this.state.loading) ? (<Loader inline active size='mini' />) : (
             (this.state.unavailableDomains.length > 0) ? (
-            <Form>
-              {this.state.availableDomains.map((domain, key) => (
-                <Form.Field key={key}>
-                  <Checkbox
-                    label={domain}
-                    style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
-                    checked={this.state.selectedDomains.includes(domain)}
-                    onChange={(e, data) => {
-                      if (data.checked) {
-                        this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
-                      } else {
-                        this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
-                      }
-                    }}
-                  />
-                </Form.Field>
-              ))}
-            </Form>
+              <Form>
+                {this.state.availableDomains.map((domain, key) => (
+                  <Form.Field key={key}>
+                    <Checkbox
+                      label={domain}
+                      style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
+                      checked={this.state.selectedDomains.includes(domain)}
+                      onChange={(e, data) => {
+                        if (data.checked) {
+                          this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
+                        } else {
+                          this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
+                        }
+                      }}
+                    />
+                  </Form.Field>
+                ))}
+              </Form>
             ) : (<p>You do not have your own ens names. Register at least one to continue.</p>)
           )}
 
@@ -267,7 +267,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <TxFailure type='transaction'/>
+          <TxFailure type='transaction' />
         </Segment>
       </React.Fragment>
     );

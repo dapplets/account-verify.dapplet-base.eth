@@ -21,7 +21,7 @@ export class EnsService {
         // ToDo: UTS46 and nameprep
         const name = (domain.lastIndexOf('.eth') === domain.length - 4) ? domain.substr(0, domain.length - 4) : domain;
         const id = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(name.toLowerCase()));
-        
+
         const body = {
             operationName: "getRegistrantFromSubgraph",
             variables: {

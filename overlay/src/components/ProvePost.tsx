@@ -1,5 +1,4 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
 import { Message, Button, Icon } from 'semantic-ui-react';
 //import './ProvePost.css';
 
@@ -11,11 +10,6 @@ interface IState {
 }
 
 export class ProvePost extends React.Component<IProps, IState> {
-
-  constructor(props: IProps) {
-    super(props);
-  }
-
   render() {
     const { message } = this.props;
 
@@ -25,7 +19,7 @@ export class ProvePost extends React.Component<IProps, IState> {
         <Message>
           <p style={{ overflowWrap: 'break-word' }}>{message}</p>
         </Message>
-        <Button primary onClick={() => {navigator.clipboard.writeText(message)}}>
+        <Button primary onClick={() => { navigator.clipboard.writeText(message) }}>
           <Icon name='copy' />
           Copy
         </Button>

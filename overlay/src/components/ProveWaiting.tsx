@@ -1,9 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-//import './ProveWaiting.css';
-import { Segment, Loader, Divider, Button } from 'semantic-ui-react';
+import { Loader, Divider, Button } from 'semantic-ui-react';
 import { ProfileCard } from './ProfileCard';
 import { Profile } from '../dappletBus';
+
+//import './ProveWaiting.css';
 
 interface IProps {
   onGotIt?: Function;
@@ -49,7 +49,7 @@ export class ProveWaiting extends React.Component<IProps, IState> {
         );
       case Stages.Success:
         return (<React.Fragment>
-          <ProfileCard profile={this.props.profile}/>
+          <ProfileCard profile={this.props.profile} />
 
           <Divider hidden fitted />
 
@@ -64,6 +64,5 @@ export class ProveWaiting extends React.Component<IProps, IState> {
           Failure
         </React.Fragment>)
     }
-
   }
 }

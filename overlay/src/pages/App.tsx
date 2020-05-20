@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import './App.css';
 import { Home } from './Home';
 import { ProfileLinking } from './ProfileLinking';
@@ -27,7 +27,7 @@ export class App extends React.Component<IProps, IState> {
     if (!this.state.profile) {
       return (
         <Segment>
-            <Loader active inline='centered'>Context waiting</Loader>
+          <Loader active inline='centered'>Context waiting</Loader>
         </Segment>
       );
     }
@@ -35,17 +35,17 @@ export class App extends React.Component<IProps, IState> {
     return (
       <div className="App-container">
         <Router>
-            <Switch>
-              <Route exact path="/">
-                <Home profile={this.state.profile} />
-              </Route>
-              <Route path="/profile-linking">
-                <ProfileLinking profile={this.state.profile} />
-              </Route>
-              <Route path="/links">
-                <Links profile={this.state.profile} />
-              </Route>
-            </Switch>
+          <Switch>
+            <Route exact path="/">
+              <Home profile={this.state.profile} />
+            </Route>
+            <Route path="/profile-linking">
+              <ProfileLinking profile={this.state.profile} />
+            </Route>
+            <Route path="/links">
+              <Links profile={this.state.profile} />
+            </Route>
+          </Switch>
         </Router>
       </div>
     );

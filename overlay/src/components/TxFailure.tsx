@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Segment, Loader, Button } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 //import './TxFailure.css';
 
 interface IProps {
@@ -12,12 +11,7 @@ interface IState {
 }
 
 export class TxFailure extends React.Component<IProps, IState> {
-
-  constructor(props: IProps) {
-    super(props);
-  }
-
-  renderFailure() {
+  render() {
     return (
       <React.Fragment>
         <p>{(this.props.type === 'sign') ? 'Signing was rejected' : 'Transaction was rejected'}</p>

@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Card, Icon, Image, Button, Divider, Header as SHeader } from 'semantic-ui-react';
+import { Icon, Divider, Header as SHeader } from 'semantic-ui-react';
 //import './Header.css';
 
 interface IProps {
@@ -13,10 +12,6 @@ interface IState {
 }
 
 export class Header extends React.Component<IProps, IState> {
-
-    constructor(props: IProps) {
-        super(props);
-    }
 
     render() {
         const { title, onBack, subtitle } = this.props;

@@ -1,8 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Icon, Divider, Table, Label, Menu, Button, Loader } from 'semantic-ui-react';
+import { Redirect } from "react-router-dom";
+import { Table, Button, Loader } from 'semantic-ui-react';
 import { Header } from '../components/Header';
-import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
 import { TxSuccess } from '../components/TxSuccess';
@@ -111,7 +110,7 @@ export class Links extends React.Component<IProps, IState> {
                     <Table.HeaderCell>Actions</Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
-  
+
                 <Table.Body>
                   {this.state.accounts.map((a, key) => (
                     <Table.Row key={key}>
@@ -123,11 +122,11 @@ export class Links extends React.Component<IProps, IState> {
                     </Table.Row>
                   ))}
                 </Table.Body>
-  
+
               </Table >
             )
         )}
-        
+
       </React.Fragment>
     );
   }

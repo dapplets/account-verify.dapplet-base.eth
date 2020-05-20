@@ -10,7 +10,7 @@ export type Account = {
 export class IdentityService {
 
     private _contract: ethers.Contract;
-    
+
     constructor() {
         const signer = new DappletSigner();
         this._contract = new ethers.Contract('0x78E2ef829b573BC814A3C29630717548AfB2186D', abi, signer);

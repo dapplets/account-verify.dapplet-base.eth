@@ -1,15 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Card, Icon, Image, Button, Divider, Loader, Dimmer, Segment } from 'semantic-ui-react';
+import { Link } from "react-router-dom";
+import { Button, Divider } from 'semantic-ui-react';
 import { ProfileCard } from '../components/ProfileCard';
-import { dappletInstance, Profile } from '../dappletBus';
+import { Profile } from '../dappletBus';
 
 interface IProps {
   profile: Profile;
 }
 
 interface IState {
-  
+
 }
 
 export class Home extends React.Component<IProps, IState> {

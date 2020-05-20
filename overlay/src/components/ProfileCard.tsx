@@ -1,6 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, HashRouter, Route, Link, Redirect, Switch } from "react-router-dom";
-import { Card, Icon, Image, Button, Divider } from 'semantic-ui-react';
+import { Card, Image } from 'semantic-ui-react';
 import { Profile } from '../dappletBus';
 //import './ProfileCard.css';
 
@@ -12,11 +11,6 @@ interface IState {
 }
 
 export class ProfileCard extends React.Component<IProps, IState> {
-
-    constructor(props: IProps) {
-        super(props);
-    }
-
     render() {
         return (
             <Card fluid >
