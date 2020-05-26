@@ -2,6 +2,9 @@
     "hostnames": {
         "twitter.com": {
             "account-verify.dapplet-base.eth": "0.0.4"
+        },
+        "www.instagram.com": {
+            "account-verify.dapplet-base.eth": "0.0.4"
         }
     },
     "modules": {

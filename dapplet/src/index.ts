@@ -15,7 +15,7 @@ type Account = {
 @Injectable
 export default class Feature implements IFeature {
 
-    @Inject("twitter-adapter.dapplet-base.eth")
+    @Inject("instagram-adapter.dapplet-base.eth")
     public adapter: any; // ITwitterAdapter;
 
     public config: any; // T_TwitterFeatureConfig;
@@ -26,7 +26,7 @@ export default class Feature implements IFeature {
 
     constructor() {
         const wallet = Core.wallet();
-        const overlay = Core.overlay({ url: 'https://localhost:3000', title: 'Identity Management' });
+        const overlay = Core.overlay({ url: 'https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1', title: 'Identity Management' });
         const provider = ethers.getDefaultProvider('rinkeby');
         this._contract = new ethers.Contract('0x78E2ef829b573BC814A3C29630717548AfB2186D', abi, provider);
 
@@ -38,7 +38,7 @@ export default class Feature implements IFeature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         img: ICON_DAPPLET,
-                        label: '',
+                        label: 'Identity',
                         exec: (ctx) => {
                             wallet.sendAndListen('eth_accounts', [], {
                                 result: (op, { type, data }) => {
@@ -79,6 +79,12 @@ export default class Feature implements IFeature {
                             }
                         }
                     }
+                }),
+                button({ 
+                    "DEFAULT": {
+                        img: ICON_DAPPLET,
+                        exec: console.log
+                    }
                 })
             ],
             TWEET_AVATAR_BADGE: [
@@ -89,8 +95,9 @@ export default class Feature implements IFeature {
                         vertical: "bottom",
                         horizontal: "left",
                         init: async (ctx, me) => {
-                            const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
-                            me.setState((accounts.length > 0) ? "GREEN" : "HIDDEN");
+                            me.setState("GREEN");
+                            // const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
+                            // me.setState((accounts.length > 0) ? "GREEN" : "HIDDEN");
                         }
                     },
                     "GREEN": {
@@ -111,8 +118,9 @@ export default class Feature implements IFeature {
                         vertical: "bottom",
                         horizontal: "left",
                         init: async (ctx, me) => {
-                            const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
-                            me.setState((accounts.length > 0) ? "GREEN" : "HIDDEN");
+                            me.setState("GREEN");
+                            // const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
+                            // me.setState((accounts.length > 0) ? "GREEN" : "HIDDEN");
                         }
                     },
                     "GREEN": {
