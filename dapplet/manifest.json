@@ -1,7 +1,7 @@
 {
     "name": "account-verify.dapplet-base.eth",
     "branch": "default",
-    "version": "0.0.4",
+    "version": "0.1.0",
     "type": "FEATURE",
     "title": "Identity Management",
     "description": "Connect your identities in social networks and crypto.",
@@ -9,6 +9,6 @@
     "dist": "lib/index.js",
     "icon": "src/icons/icon.png",
     "dependencies": {
-        "twitter-adapter.dapplet-base.eth": "0.3.6"
+        "identity-adapter.dapplet-base.eth": "0.1.0"
     }
 }
