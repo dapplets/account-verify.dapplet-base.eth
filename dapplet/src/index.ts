@@ -118,7 +118,7 @@ export default class Feature implements IFeature {
                     },
                     "GREEN": {
                         img: ICON_GREEN,
-                        vertical: "top",
+                        vertical: "bottom",
                         horizontal: "left"
                     },
                     "HIDDEN": {
