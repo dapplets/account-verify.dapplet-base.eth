@@ -11,7 +11,7 @@
     "modules": {
         "account-verify.dapplet-base.eth": {
             "default": {
-                "0.1.0": "manifest.json"
+                "0.1.1": "manifest.json"
             }
         }
     }
