@@ -138,12 +138,4 @@ export default class Feature implements IFeature {
 
         return this._accounts.get(key);
     }
-
-    public activate() {
-        this.adapter.attachFeature(this);
-    }
-
-    public deactivate() {
-        this.adapter.detachFeature(this);
-    }
 }
