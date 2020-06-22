@@ -13,18 +13,17 @@ type Account = {
 }
 
 @Injectable
-export default class Feature implements IFeature {
-
-    @Inject("identity-adapter.dapplet-base.eth")
-    public adapter: any; // ITwitterAdapter;
-
+export default class Feature {
     public config: any; // T_TwitterFeatureConfig;
     private _currentProve: string = null;
     private _currentAddress: string = null;
     private _contract: ethers.Contract;
     private _accounts = new Map<string, Promise<Account[]>>();
 
-    constructor() {
+    constructor(
+        @Inject("identity-adapter.dapplet-base.eth")
+        public adapter: any // ITwitterAdapter;
+    ) {
         const wallet = Core.wallet();
         const overlay = Core.overlay({ url: 'https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1', title: 'Identity Management' });
         const provider = ethers.getDefaultProvider('rinkeby');
@@ -127,6 +126,8 @@ export default class Feature implements IFeature {
                 })
             ]
         };
+
+        this.adapter.attachConfig(this.config);
     }
 
     private async _getAccounts(account: Account): Promise<Account[]> {
@@ -137,13 +138,5 @@ export default class Feature implements IFeature {
         }
 
         return this._accounts.get(key);
-    }
-
-    public activate() {
-        this.adapter.attachFeature(this);
-    }
-
-    public deactivate() {
-        this.adapter.detachFeature(this);
     }
 }
