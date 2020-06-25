@@ -56,12 +56,13 @@ export default class Feature {
                                     });
                                 },
                                 'get_account': () => overlay.send('current_account', this._currentAddress),
-                                'send_transaction': (op, { type, message }) => {
-                                    wallet.sendAndListen('eth_sendTransaction', [message], {
-                                        result: (op, { type, data }) => {
-                                            overlay.send('transaction_result', data);
-                                        }
-                                    });
+                                'add_account': async (op, data) => {
+                                    const result = await this._contract.addAccount(data.message.oldAccount, data.message.newAccount); // signed
+                                    overlay.send('add_account', result);
+                                },
+                                'remove_account': async (op, data) => {
+                                    const result = await this._contract.removeAccount(data.message.oldAccount, data.message.newAccount);
+                                    overlay.send('remove_account', result);
                                 }
                             });
                         }
