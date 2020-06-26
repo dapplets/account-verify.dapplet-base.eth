@@ -1,7 +1,7 @@
 {
   "name": "account-verify.dapplet-base.eth",
   "version": "0.1.2",
-  "description": "Display a Verified Account Mark if the account is owned by the ethereum id",
+  "description": "Connect your identities in social networks and crypto",
   "main": "lib/index.js",
   "scripts": {
     "start": "rollup -w --config rollup.config.js",
@@ -22,5 +22,14 @@
   },
   "dependencies": {
     "ethers": "^4.0.47"
+  },
+  "dapplets": {
+    "branch": "default",
+    "type": "FEATURE",
+    "title": "Identity Management",
+    "icon": "src/icons/icon.png",
+    "dependencies": {
+      "identity-adapter.dapplet-base.eth": "0.2.0"
+    }
   }
 }
