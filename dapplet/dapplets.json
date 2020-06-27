@@ -1,12 +1,6 @@
 {
     "contextIds": {
-        "account-verify.dapplet-base.eth": ["identity-adapter.dapplet-base.eth"],
-        "twitter-adapter.dapplet-base.eth": ["twitter.com"],
-        "instagram-adapter.dapplet-base.eth": ["instagram.com", "www.instagram.com"]
-    },
-    "interfaces": {
-        "twitter-adapter.dapplet-base.eth": ["identity-adapter.dapplet-base.eth"],
-        "instagram-adapter.dapplet-base.eth": ["identity-adapter.dapplet-base.eth"]
+        "account-verify.dapplet-base.eth": ["identity-adapter.dapplet-base.eth"]
     },
     "modules": {
         "account-verify.dapplet-base.eth": {
