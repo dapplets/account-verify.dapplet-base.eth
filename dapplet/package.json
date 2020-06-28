@@ -22,15 +22,5 @@
   },
   "dependencies": {
     "ethers": "^4.0.47"
-  },
-  "dapplets": {
-    "branch": "default",
-    "type": "FEATURE",
-    "title": "Identity Management",
-    "icon": "src/icons/icon.png",
-    "contextIds": ["identity-adapter.dapplet-base.eth"],
-    "dependencies": {
-      "identity-adapter.dapplet-base.eth": "0.2.0"
-    }
   }
 }
