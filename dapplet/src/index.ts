@@ -1,11 +1,12 @@
 import abi from './abi';
 import ethers from 'ethers';
-import { IFeature } from '@dapplets/dapplet-extension'
+import { IFeature } from '@dapplets/dapplet-extension';
 import ICON_DAPPLET from './icons/dapplet.png';
 import ICON_GREEN from './icons/green.svg';
 import ICON_LOADING from './icons/loading.svg';
 // import ICON_YELLOW from './icons/yellow.svg';
 // import ICON_RED from './icons/red.svg';
+import DefaultConfig from './config.json';
 
 type Account = {
     domainId: number; // 1 - twitter, 2 - ens
@@ -13,6 +14,7 @@ type Account = {
 }
 
 @Injectable
+@Configure(DefaultConfig)
 export default class Feature {
     public config: any; // T_TwitterFeatureConfig;
     private _currentProve: string = null;
@@ -25,9 +27,9 @@ export default class Feature {
         public adapter: any // ITwitterAdapter;
     ) {
         const wallet = Core.wallet();
-        const overlay = Core.overlay({ url: 'https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1', title: 'Identity Management' });
+        const overlay = Core.overlay({ url: Core.storage.get('overlayUrl'), title: 'Identity Management' });
         const provider = ethers.getDefaultProvider('rinkeby');
-        this._contract = new ethers.Contract('0x78E2ef829b573BC814A3C29630717548AfB2186D', abi, provider);
+        this._contract = new ethers.Contract(Core.storage.get('contractAddress'), abi, provider);
 
         const { badge, button } = this.adapter.widgets;
 

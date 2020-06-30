@@ -1,0 +1,14 @@
+{
+    "main": {
+        "overlayUrl": "https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1",
+        "contractAddress": "0x78E2ef829b573BC814A3C29630717548AfB2186D"
+    },
+    "test": {
+        "overlayUrl": "https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1",
+        "contractAddress": "0x78E2ef829b573BC814A3C29630717548AfB2186D"
+    },
+    "dev": {
+        "overlayUrl": "https://localhost:3000",
+        "contractAddress": "0x78E2ef829b573BC814A3C29630717548AfB2186D"
+    }
+}
