@@ -4,16 +4,12 @@ import { IFeature } from '@dapplets/dapplet-extension';
 import ICON_DAPPLET from './icons/dapplet.png';
 import ICON_GREEN from './icons/green.svg';
 import ICON_LOADING from './icons/loading.svg';
-import DefaultConfig from './config/default.json';
-import SchemaConfig from './config/schema.json';
-
 type Account = {
     domainId: number; // 1 - twitter, 2 - ens
     name: string;
 }
 
 @Injectable
-@Configure(DefaultConfig, SchemaConfig)
 export default class Feature {
     public config: any; // T_TwitterFeatureConfig;
     private _currentProve: string = null;
