@@ -1,1 +1,17 @@
-{}
+{
+    "type": "object",
+    "required": [
+        "overlayUrl",
+        "contractAddress"
+    ],
+    "properties": {
+        "overlayUrl": {
+            "type": "string",
+            "title": "Overlay URL"
+        },
+        "contractAddress": {
+            "type": "string",
+            "title": "Contract Address"
+        }
+    }
+}
