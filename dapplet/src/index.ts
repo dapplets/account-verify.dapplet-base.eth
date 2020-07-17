@@ -25,7 +25,7 @@ export default class Feature {
         const wallet = Core.wallet();
         Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Identity Management' }));
 
-        const { badge, button } = this.adapter.widgets;
+        const { badge, button } = this.adapter.exports;
 
         this.config = {
             PROFILE_BUTTON_GROUP: [
