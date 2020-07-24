@@ -4,27 +4,29 @@ import './App.css';
 import { Home } from './Home';
 import { ProfileLinking } from './ProfileLinking';
 import { Links } from './Links';
-import { dappletInstance, Profile } from '../dappletBus';
+import { CreateClaim } from './CreateClaim';
+import { Claims } from './Claims';
+import { dappletInstance, Profile, Settings } from '../dappletBus';
 import { Segment, Loader } from 'semantic-ui-react';
 
 interface IProps {
 }
 
 interface IState {
-  profile: Profile | null
+  context: Profile & Settings | null;
 }
 
 export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = { profile: null };
-    dappletInstance.onProfileSelect((profile) => this.setState({ profile }));
+    this.state = { context: null };
+    dappletInstance.onProfileSelect((context) => this.setState({ context }));
   }
 
   render() {
 
-    if (!this.state.profile) {
+    if (!this.state.context) {
       return (
         <Segment>
           <Loader active inline='centered'>Context waiting</Loader>
@@ -37,13 +39,19 @@ export class App extends React.Component<IProps, IState> {
         <HashRouter>
           <Switch>
             <Route exact path="/">
-              <Home profile={this.state.profile} />
+              <Home context={this.state.context} />
             </Route>
             <Route path="/profile-linking">
-              <ProfileLinking profile={this.state.profile} />
+              <ProfileLinking context={this.state.context} />
             </Route>
             <Route path="/links">
-              <Links profile={this.state.profile} />
+              <Links context={this.state.context} />
+            </Route>
+            <Route path="/create-claim">
+              <CreateClaim context={this.state.context} />
+            </Route>
+            <Route path="/claims">
+              <Claims context={this.state.context} />
             </Route>
           </Switch>
         </HashRouter>

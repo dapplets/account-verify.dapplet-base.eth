@@ -6,7 +6,7 @@ import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
 import { ProvePost } from '../components/ProvePost';
 import { Header } from '../components/Header';
-import { Profile, dappletInstance } from '../dappletBus';
+import { Profile, dappletInstance, Settings } from '../dappletBus';
 import { EnsService } from '../services/ensService';
 import { findEnsNames } from '../helpers';
 import { IdentityService } from '../services/identityService';
@@ -14,7 +14,7 @@ import { IdentityService } from '../services/identityService';
 //import './ProfileLinking.css';
 
 interface IProps {
-  profile: Profile;
+  context: Profile & Settings;
 }
 
 enum Stages {
@@ -69,7 +69,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
   async componentDidMount() {
     const ensService = new EnsService();
 
-    const { profile } = this.props;
+    const { context: profile } = this.props;
     // ToDo: 
     const domainsFromFullname = findEnsNames(profile.authorFullname);
     const domainFromUsername = `${profile.authorUsername}.eth`;
@@ -95,8 +95,8 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       this.setStage(Stages.ProvePost);
       dappletInstance.onProvePublished(async proveUrl => {
         this.setState({ proveUrl });
-        const identityService = new IdentityService();
-        const currentAccount = { domainId: 1, name: this.props.profile.authorUsername.toLowerCase() };
+        const identityService = new IdentityService(this.props.context.contractAddress);
+        const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
         const newAccount = { domainId: 2, name: selectedDomain };
         this.setStage(Stages.TxWaiting);
 
@@ -137,7 +137,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setState({ redirect: '/' })}
         />
 
-        <ProfileCard profile={this.props.profile} />
+        <ProfileCard profile={this.props.context} />
 
         <Segment>
           <p>Authentication takes place in two stages:</p>

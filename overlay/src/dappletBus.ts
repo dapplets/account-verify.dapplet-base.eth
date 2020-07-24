@@ -6,14 +6,19 @@ export type Profile = {
     authorImg: string;
 }
 
+export type Settings = {
+    contractAddress: string;
+    oracleAddress: string;
+}
+
 export type UnsignedProve = string;
 export type SignedProve = string;
 
 class DappletBus extends Bus {
     _subId: number = 0;
 
-    onProfileSelect(callback: (profile: Profile) => void) {
-        this.subscribe('profile_select', (profile: Profile) => {
+    onProfileSelect(callback: (profile: Profile & Settings) => void) {
+        this.subscribe('profile_select', (profile: Profile & Settings) => {
             callback(profile);
             return (++this._subId).toString();
         });

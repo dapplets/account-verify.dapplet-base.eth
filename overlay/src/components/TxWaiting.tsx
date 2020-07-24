@@ -13,12 +13,12 @@ export class TxWaiting extends React.Component<IProps, IState> {
   render() {
     if (this.props.type === 'sign') {
       return <React.Fragment>
-        <p>Waiting of the message signing in your wallet.</p>
+        <p>Please confirm the transaction in your wallet.</p>
         <Loader active inline='centered'>Signing</Loader>
       </React.Fragment>;
     } else {
       return <React.Fragment>
-        <p>Waiting of the transaction confirmation in your wallet.</p>
+        <p>Please confirm the transaction in your wallet.</p>
         <Loader active inline='centered'>Mining</Loader>
       </React.Fragment>;
     }

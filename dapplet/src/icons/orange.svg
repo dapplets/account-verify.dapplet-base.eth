@@ -1,0 +1,13 @@
+<svg width="451.42902" height="451.42902" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <rect x="-1" y="-1" width="453.42902" height="453.42902" id="canvas_background" fill="none"/>
+ </g>
+ <g>
+  <g transform="matrix(1.3580428,0,0,1.3580428,2065.078,44.928302) " id="layer1-6"/>
+  <path d="m451.429065,225.714517a225.714512,225.714512 0 0 1 -225.71457,225.7145a225.714512,225.714512 0 0 1 -225.714465,-225.7145a225.714512,225.714512 0 0 1 225.714465,-225.714512a225.714512,225.714512 0 0 1 225.71457,225.714512z" id="path3866" fill-rule="nonzero" fill="#ff7f00"/>
+  <g transform="matrix(-3.1435529,0,0,-3.1435529,10926.161,-138.49162) " id="text3890" fill="#ffffff" font-family="'College Slab'" font-size="144px" font-weight="bold" font-style="normal">
+   <path d="m3412.862106,-136.3984l0,73.872l-17.856,0l0,-73.872l17.856,0" id="path3089" fill="#ffffff"/>
+   <circle id="path3085" transform="matrix(0.3181114,0,0,0.3181114,2440.9065,-251.44719) " cx="3027.328187" cy="293.648034" r="35.067654" fill-rule="nonzero" fill="#ffffff"/>
+  </g>
+ </g>
+</svg>

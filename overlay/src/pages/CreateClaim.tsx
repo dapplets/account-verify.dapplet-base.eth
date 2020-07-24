@@ -1,24 +1,30 @@
 import React from 'react';
 import { Redirect } from "react-router-dom";
-import { Table, Button, Loader } from 'semantic-ui-react';
+import { Table, Button, Loader, Checkbox, Divider, TextArea, Form } from 'semantic-ui-react';
 import { Header } from '../components/Header';
 import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
 import { TxSuccess } from '../components/TxSuccess';
-import { IdentityService, Account } from '../services/identityService';
+import { IdentityService, Account, Claim, ClaimTypes } from '../services/identityService';
 import { Profile, Settings } from '../dappletBus';
+import { ProfileCard } from '../components/ProfileCard';
+import { TextService } from '../services/textService';
 
 //import './Links.css';
 
 interface IProps {
-  context: Profile & Settings;
+  context: Profile & Settings
 }
 
 interface IState {
   redirect: string | null;
   stage: Stages;
-  accounts: Account[];
+  claims: Claim[];
   loading: boolean;
+  checkbox1: boolean;
+  checkbox2: boolean;
+  checkbox3: boolean;
+  text: string;
 }
 
 enum Stages {
@@ -28,19 +34,25 @@ enum Stages {
   TxFailure
 }
 
-export class Links extends React.Component<IProps, IState> {
+export class CreateClaim extends React.Component<IProps, IState> {
 
   _identityService: IdentityService;
+  _textService: TextService;
 
   constructor(props: IProps) {
     super(props);
     this.state = {
       redirect: null,
       stage: Stages.Links,
-      accounts: [],
-      loading: true
+      claims: [],
+      loading: true,
+      checkbox1: false,
+      checkbox2: false,
+      checkbox3: false,
+      text: ''
     };
     this._identityService = new IdentityService(this.props.context.contractAddress);
+    this._textService = new TextService();
   }
 
   setStage(stage: Stages) {
@@ -48,19 +60,14 @@ export class Links extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    const accounts = await this._identityService.getAccounts({
+    const claims = await this._identityService.getClaimsByAccount({
       domainId: 1,
       name: this.props.context.authorUsername.toLowerCase()
     });
-    this.setState({ accounts, loading: false });
+    this.setState({ claims, loading: false });
   }
 
-  private _domainIdToName(domainId: number) {
-    const map = [undefined, 'Twitter', 'ENS'];
-    return map[domainId] || 'Unknown';
-  }
-
-  private async _unlinkAccount(removingAccount: Account) {
+  private async _createClaim() {
     const currentAccount: Account = {
       domainId: 1,
       name: this.props.context.authorUsername.toLowerCase()
@@ -69,8 +76,17 @@ export class Links extends React.Component<IProps, IState> {
     this.setStage(Stages.TxWaiting);
     const identityService = new IdentityService(this.props.context.contractAddress);
 
+    let claimTypes = 0;
+    if (this.state.checkbox1) claimTypes += ClaimTypes.AccountMimicsAnotherOne;
+    if (this.state.checkbox2) claimTypes += ClaimTypes.UnusualBehaviour;
+    if (this.state.checkbox3) claimTypes += ClaimTypes.ProducesTooManyScams;
+
     try {
-      await identityService.removeAccount(currentAccount, removingAccount);
+      let link = null;
+      if (this.state.text.trim()) {
+        link = await this._textService.save(this.state.text);
+      }
+      await identityService.createClaim(claimTypes, link, currentAccount, this.props.context.oracleAddress);
       this.setStage(Stages.TxSuccess);
     } catch (err) {
       this.setStage(Stages.TxFailure);
@@ -94,38 +110,39 @@ export class Links extends React.Component<IProps, IState> {
     return (
       <React.Fragment>
         <Header
-          title='My accounts'
+          title='Identity Claims'
           onBack={() => this.setState({ redirect: '/' })}
         />
 
-        {(this.state.loading) ? (<Loader active inline='centered'>Loading</Loader>) : (
-          (this.state.accounts.length === 0) ? (
-            <p>You have no linked accounts yet.</p>
-          ) : (
-              <Table unstackable>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>Type</Table.HeaderCell>
-                    <Table.HeaderCell>Address</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
+        <p>What is wrong with this account?</p>
+        <ProfileCard profile={this.props.context} />
 
-                <Table.Body>
-                  {this.state.accounts.map((a, key) => (
-                    <Table.Row key={key}>
-                      <Table.Cell>{this._domainIdToName(a.domainId)}</Table.Cell>
-                      <Table.Cell>{a.name}</Table.Cell>
-                      <Table.Cell>
-                        <Button size='mini' onClick={() => this._unlinkAccount(a)}>Unlink</Button>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
+        <Checkbox
+          label='Account mimics another one'
+          checked={this.state.checkbox1}
+          onChange={(e, a) => this.setState({ checkbox1: !!a.checked })}
+          style={{ marginBottom: 15 }}
+        /><br />
+        <Checkbox
+          label='Unusual behaviour'
+          checked={this.state.checkbox2}
+          onChange={(e, a) => this.setState({ checkbox2: !!a.checked })}
+          style={{ marginBottom: 15 }}
+        /><br />
+        <Checkbox
+          label='Produces too many scams'
+          checked={this.state.checkbox3}
+          onChange={(e, a) => this.setState({ checkbox3: !!a.checked })}
+          style={{ marginBottom: 20 }}
+        /><br />
 
-              </Table >
-            )
-        )}
+        <Form style={{ marginBottom: 15 }}>
+          <TextArea placeholder='Tell more about the problem' value={this.state.text} onChange={(e, v) => this.setState({ text: v.value as string || '' })} />
+        </Form>
+
+        <Button fluid primary onClick={() => this._createClaim()}>Next</Button>
+        <Divider hidden fitted />
+        <Button fluid primary onClick={() => this.setState({ redirect: '/' })}>Cancel</Button>
 
       </React.Fragment>
     );

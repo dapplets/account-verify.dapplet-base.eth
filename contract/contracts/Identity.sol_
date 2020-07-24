@@ -1,5 +1,5 @@
 pragma experimental ABIEncoderV2;
-pragma solidity ^0.5.0;
+pragma solidity ~0.6.7;
 
 contract Verifier {
     uint256 constant chainId = 1;
@@ -22,7 +22,7 @@ contract Verifier {
         salt
     ));
     
-    mapping (uint => uint) linkedNames
+    mapping (uint => uint) linkedNames;
     
     struct Identity {
         string networkId;
