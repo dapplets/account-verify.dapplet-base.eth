@@ -153,6 +153,7 @@ export class Claims extends React.Component<IProps, IState> {
                         </Card.Meta>
                         <Card.Description>
                           <List bulleted>
+                            {(this._isContains(a.claimTypes, ClaimTypes.NoIssues)) ? <List.Item>account is not scammer;</List.Item> : null}
                             {(this._isContains(a.claimTypes, ClaimTypes.AccountMimicsAnotherOne)) ? <List.Item>account mimics another one;</List.Item> : null}
                             {(this._isContains(a.claimTypes, ClaimTypes.UnusualBehaviour)) ? <List.Item>unusual behaviour;</List.Item> : null}
                             {(this._isContains(a.claimTypes, ClaimTypes.ProducesTooManyScams)) ? <List.Item>produces too many scams;</List.Item> : null}

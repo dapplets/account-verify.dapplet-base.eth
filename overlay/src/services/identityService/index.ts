@@ -16,6 +16,7 @@ export enum ClaimStatus {
 }
 
 export enum ClaimTypes {
+    NoIssues = 0,
     AccountMimicsAnotherOne = 1,
     UnusualBehaviour = 2,
     ProducesTooManyScams = 4
@@ -63,8 +64,9 @@ export class IdentityService {
 
     async createClaim(claimTypes: number, link: string | null, account: Account, oracle: string) {
         const linkBytes = link ? '0x' + link : '0x0';
-        const tx = await this._contract.createClaim(claimTypes, linkBytes, account, oracle);
-        await tx.wait();
+        const tx = await this._contract.createClaim(claimTypes, linkBytes, account, oracle); // signing
+        // ToDo: show signing in UI
+        await tx.wait(); // mining
     }
 
     async cancelClaim(id: number) {
@@ -85,7 +87,7 @@ export class IdentityService {
     async getClaimsByAccount(account: Account): Promise<Claim[]> {
         const [claims, indexes] = await this._contract.getClaimsByAccount(account);
         claims.forEach((c: Claim, i: number) => c.id = indexes[i].toNumber());
-        claims.forEach((c: Claim) => c.link = (c.link === null  || c.link === '0x') ? null : c.link.substring(2));
+        claims.forEach((c: Claim) => c.link = (c.link === null || c.link === '0x' || c.link === '0x0' || c.link === '0x00') ? null : c.link.substring(2));
         claims.forEach((c: any) => c.timestamp = new Date(c.timestamp.toNumber() * 1000));
         return claims;
     }
@@ -93,7 +95,7 @@ export class IdentityService {
     async getClaimsByOracle(oracle: string): Promise<Claim[]> {
         const [claims, indexes] = await this._contract.getClaimsByOracle(oracle);
         claims.forEach((c: Claim, i: number) => c.id = indexes[i].toNumber());
-        claims.forEach((c: Claim) => c.link = (c.link === null  || c.link === '0x') ? null : c.link.substring(2));
+        claims.forEach((c: Claim) => c.link = (c.link === null  || c.link === '0x' || c.link === '0x0' || c.link === '0x00') ? null : c.link.substring(2));
         claims.forEach((c: any) => c.timestamp = new Date(c.timestamp.toNumber() * 1000));
         return claims;
     }

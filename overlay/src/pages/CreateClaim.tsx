@@ -24,6 +24,7 @@ interface IState {
   checkbox1: boolean;
   checkbox2: boolean;
   checkbox3: boolean;
+  checkbox4: boolean;
   text: string;
 }
 
@@ -49,6 +50,7 @@ export class CreateClaim extends React.Component<IProps, IState> {
       checkbox1: false,
       checkbox2: false,
       checkbox3: false,
+      checkbox4: false,
       text: ''
     };
     this._identityService = new IdentityService(this.props.context.contractAddress);
@@ -77,9 +79,10 @@ export class CreateClaim extends React.Component<IProps, IState> {
     const identityService = new IdentityService(this.props.context.contractAddress);
 
     let claimTypes = 0;
-    if (this.state.checkbox1) claimTypes += ClaimTypes.AccountMimicsAnotherOne;
-    if (this.state.checkbox2) claimTypes += ClaimTypes.UnusualBehaviour;
-    if (this.state.checkbox3) claimTypes += ClaimTypes.ProducesTooManyScams;
+    if (this.state.checkbox1) claimTypes += ClaimTypes.NoIssues;
+    if (this.state.checkbox2) claimTypes += ClaimTypes.AccountMimicsAnotherOne;
+    if (this.state.checkbox3) claimTypes += ClaimTypes.UnusualBehaviour;
+    if (this.state.checkbox4) claimTypes += ClaimTypes.ProducesTooManyScams;
 
     try {
       let link = null;
@@ -118,21 +121,31 @@ export class CreateClaim extends React.Component<IProps, IState> {
         <ProfileCard profile={this.props.context} />
 
         <Checkbox
-          label='Account mimics another one'
+          label='Account is not scammer'
           checked={this.state.checkbox1}
-          onChange={(e, a) => this.setState({ checkbox1: !!a.checked })}
+          disabled={this.state.checkbox2 || this.state.checkbox3 || this.state.checkbox4}
+          onChange={(e, a) => this.setState({ checkbox1: !!a.checked, checkbox2: false, checkbox3: false, checkbox4: false })}
+          style={{ marginBottom: 15 }}
+        /><br />
+        <Checkbox
+          label='Account mimics another one'
+          checked={this.state.checkbox2}
+          disabled={this.state.checkbox1}
+          onChange={(e, a) => this.setState({ checkbox2: !!a.checked, checkbox1: false })}
           style={{ marginBottom: 15 }}
         /><br />
         <Checkbox
           label='Unusual behaviour'
-          checked={this.state.checkbox2}
-          onChange={(e, a) => this.setState({ checkbox2: !!a.checked })}
+          checked={this.state.checkbox3}
+          disabled={this.state.checkbox1}
+          onChange={(e, a) => this.setState({ checkbox3: !!a.checked, checkbox1: false })}
           style={{ marginBottom: 15 }}
         /><br />
         <Checkbox
           label='Produces too many scams'
-          checked={this.state.checkbox3}
-          onChange={(e, a) => this.setState({ checkbox3: !!a.checked })}
+          checked={this.state.checkbox4}
+          disabled={this.state.checkbox1}
+          onChange={(e, a) => this.setState({ checkbox4: !!a.checked, checkbox1: false })}
           style={{ marginBottom: 20 }}
         /><br />
 

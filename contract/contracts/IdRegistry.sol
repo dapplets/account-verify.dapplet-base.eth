@@ -93,7 +93,9 @@ contract IdRegistry {
         uint8 claimTypes = claims[id].claimTypes;
         Account storage account = accounts[claims[id].accountIdx][0];
 
-        if (claimTypes & 1 == 1) { // account mimics another one
+        if (claimTypes == 0) {
+            account.status = AccountStatus.NoIssues;
+        } else if (claimTypes & 1 == 1) { // account mimics another one
             account.status = AccountStatus.Scammer;
         } else if (claimTypes & 2 == 2) { // unusual behaviour
             account.status = AccountStatus.Exception;

@@ -38,11 +38,11 @@ export default class Feature {
                 horizontal: "left",
                 init: async (ctx, me) => {
                     const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
-                    const status = accounts.length > 0 ? accounts[0].status : null;
                     if (accounts.length === 0) me.setState("HIDDEN");
                     else if (accounts[0].status === 0) me.setState("NO_ISSUES");
                     else if (accounts[0].status === 1) me.setState("EXCEPTION");
                     else if (accounts[0].status === 2) me.setState("SCAMMER");
+                    // ToDo: add message in StatusBar
                 }
             },
             "NO_ISSUES": {
