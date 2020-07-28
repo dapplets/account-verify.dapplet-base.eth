@@ -6,6 +6,12 @@ import ICON_GREEN from './icons/green.svg';
 import ICON_ORANGE from './icons/orange.png';
 import ICON_RED from './icons/red.png';
 import ICON_LOADING from './icons/loading.svg';
+
+type Msg = {
+    uuid: string;
+    text: string;
+};
+
 type Account = {
     domainId: number; // 1 - twitter, 2 - ens
     name: string;
@@ -14,21 +20,25 @@ type Account = {
 
 @Injectable
 export default class Feature {
-    public config: any; // T_TwitterFeatureConfig;
     private _currentProve: string = null;
     private _currentAddress: string = null;
     private _contract: ethers.Contract;
     private _accounts = new Map<string, Promise<Account[]>>();
     private _overlay;
+    private _activeMessageIds = [];
 
     constructor(
         @Inject("identity-adapter.dapplet-base.eth")
-        public adapter: any // ITwitterAdapter;
+        public identityAdapter: any, // ITwitterAdapter;
+
+        @Inject("common-adapter.dapplet-base.eth")
+        public viewportAdapter: any
     ) {
         const wallet = Core.wallet();
         Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Identity Management' }));
 
-        const { badge, button } = this.adapter.exports;
+        const { statusLine } = viewportAdapter.exports;
+        const { badge, button } = this.identityAdapter.exports;
 
         const badgeConfig = ({
             initial: "DEFAULT",
@@ -37,7 +47,7 @@ export default class Feature {
                 vertical: "bottom",
                 horizontal: "left",
                 init: async (ctx, me) => {
-                    const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername.toLowerCase() });
+                    const accounts = await this._getAccounts({ domainId: 1, name: ctx.authorUsername });
                     if (accounts.length === 0) me.setState("HIDDEN");
                     else if (accounts[0].status === 0) me.setState("NO_ISSUES");
                     else if (accounts[0].status === 1) me.setState("EXCEPTION");
@@ -65,7 +75,23 @@ export default class Feature {
             }
         });
 
-        this.config = {
+        this.identityAdapter.attachConfig({
+            events: {
+                profile_changed: async (after, before) => {
+                    if (!before || !after || after.authorUsername !== before.authorUsername) {
+                        statusLine.removeMessage(this._activeMessageIds);
+                        if (!after) return;
+                        const messages: Msg[] = await this._getMessages({ domainId: 1, name: after.authorUsername });
+                        messages.forEach(m => {
+                            statusLine.addMessage({
+                                uuid: m.uuid, 
+                                text: m.text
+                            });
+                            this._activeMessageIds.push(m.uuid);
+                        });
+                    }
+                }
+            },
             PROFILE_BUTTON_GROUP: [
                 button({
                     initial: "DEFAULT",
@@ -123,12 +149,12 @@ export default class Feature {
             PROFILE_AVATAR_BADGE: [
                 badge(badgeConfig)
             ]
-        };
-
-        this.adapter.attachConfig(this.config);
+        });
     }
 
     private async _getAccounts(account: { domainId: number, name: string }): Promise<Account[]> {
+        account.name = account.name.toLowerCase();
+        
         if (!this._contract) {
             const contractAddress = await Core.storage.get('contractAddress');
             const provider = ethers.getDefaultProvider('rinkeby');
@@ -142,5 +168,19 @@ export default class Feature {
         }
 
         return this._accounts.get(key);
+    }
+
+    private async _getMessages(account: { domainId: number, name: string }): Promise<Msg[]> {
+        const accounts = await this._getAccounts(account);
+        const key = `${account.domainId}/${account.name}`;
+        if (accounts.length === 0) {
+            return [];
+        } else if (accounts[0].status == 0) {
+            return [];
+        } else if (accounts[0].status == 1) {
+            return [{ uuid: key, text: 'Unusual behaviour' }];
+        } else if (accounts[0].status == 2) {
+            return [{ uuid: key, text: 'Account mimics another one or produces too many scams' }];
+        }
     }
 }
