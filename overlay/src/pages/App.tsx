@@ -24,6 +24,10 @@ export class App extends React.Component<IProps, IState> {
     dappletInstance.onProfileSelect((context) => this.setState({ context }));
   }
 
+  componentDidMount() {
+    document.getElementsByClassName('loader-container')?.[0]?.remove();
+  }
+
   render() {
 
     if (!this.state.context) {
