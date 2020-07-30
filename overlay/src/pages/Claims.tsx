@@ -137,7 +137,7 @@ export class Claims extends React.Component<IProps, IState> {
           ) : (
               <div>
                 <Card.Group>
-                  {this.state.claims.map((a, key) => (
+                  {this.state.claims.sort((a,b) => b.id - a.id).map((a, key) => (
                     <Card key={key} fluid>
                       <Card.Content>
                         <Card.Header>
