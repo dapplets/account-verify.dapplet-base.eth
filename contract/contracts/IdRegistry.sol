@@ -73,6 +73,7 @@ contract IdRegistry {
 
     function createClaim(uint8 claimTypes, bytes memory link, AccountDto memory account, address oracle) public returns (uint) {
         bytes32 key = keccak256(abi.encodePacked(account.domainId, account.name));
+        if (accounts[key].length == 0) accounts[key].push(Account(account.domainId, account.name, AccountStatus.NoIssues));
         claims.push(Claim(claimTypes, link, oracle, msg.sender, key, ClaimStatus.InProgress, block.timestamp));
         // ToDo: event
         uint idx = claims.length - 1;

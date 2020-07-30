@@ -1,17 +1,17 @@
 {
     "main": {
         "overlayUrl": "https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1",
-        "contractAddress": "0x357BaB0d0B80C20e6D5dB802F20BB68d65787eb0",
+        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
         "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
     },
     "test": {
         "overlayUrl": "https://swarm-gateways.net/bzz:/273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1",
-        "contractAddress": "0x357BaB0d0B80C20e6D5dB802F20BB68d65787eb0",
+        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
         "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
     },
     "dev": {
         "overlayUrl": "https://localhost:3000",
-        "contractAddress": "0x357BaB0d0B80C20e6D5dB802F20BB68d65787eb0",
+        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
         "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
     }
 }
