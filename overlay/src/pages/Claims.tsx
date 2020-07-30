@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect } from "react-router-dom";
-import { Table, Button, Loader, Card, List, Label } from 'semantic-ui-react';
+import { Table, Button, Loader, Card, List, Label, Divider } from 'semantic-ui-react';
 import { Header } from '../components/Header';
 import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
@@ -13,6 +13,12 @@ import { TextService } from '../services/textService';
 
 const IS_LOADING = Symbol();
 
+enum FilterTypes {
+  InProgress,
+  Archived,
+  All
+}
+
 interface IProps {
   context: Profile & Settings
 }
@@ -23,6 +29,7 @@ interface IState {
   claims: (Claim & { text?: string | Symbol })[];
   loading: boolean;
   account: string | null;
+  filter: FilterTypes;
 }
 
 enum Stages {
@@ -44,7 +51,8 @@ export class Claims extends React.Component<IProps, IState> {
       stage: Stages.Links,
       claims: [],
       loading: true,
-      account: null
+      account: null,
+      filter: FilterTypes.InProgress
     };
     this._identityService = new IdentityService(this.props.context.contractAddress);
     this._textService = new TextService();
@@ -107,6 +115,13 @@ export class Claims extends React.Component<IProps, IState> {
     }
   }
 
+  private _claimsFilter(c: Claim) {
+    const f = this.state.filter;
+    if (f === FilterTypes.All) return true;
+    if (f === FilterTypes.Archived) return c.status === ClaimStatus.Approved || c.status === ClaimStatus.Rejected || c.status === ClaimStatus.Canceled;
+    if (f === FilterTypes.InProgress) return c.status === ClaimStatus.InProgress;
+  }
+
   render() {
     const { redirect, stage } = this.state;
 
@@ -136,8 +151,13 @@ export class Claims extends React.Component<IProps, IState> {
             <p>You have no linked accounts yet.</p>
           ) : (
               <div>
+                <Button.Group fluid style={{ marginBottom: 10 }}>
+                  <Button color='blue' basic={this.state.filter !== FilterTypes.InProgress} onClick={() => this.setState({ filter: FilterTypes.InProgress })}>In Progress</Button>
+                  <Button color='blue' basic={this.state.filter !== FilterTypes.Archived} onClick={() => this.setState({ filter: FilterTypes.Archived })}>Archived</Button>
+                  <Button color='blue' basic={this.state.filter !== FilterTypes.All} onClick={() => this.setState({ filter: FilterTypes.All })}>All</Button>
+                </Button.Group>
                 <Card.Group>
-                  {this.state.claims.sort((a,b) => b.id - a.id).map((a, key) => (
+                  {this.state.claims.sort((a, b) => b.id - a.id).filter(this._claimsFilter.bind(this)).map((a, key) => (
                     <Card key={key} fluid>
                       <Card.Content>
                         <Card.Header>
