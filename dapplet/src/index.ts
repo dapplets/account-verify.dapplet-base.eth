@@ -99,25 +99,32 @@ export default class Feature {
                         img: ICON_DAPPLET,
                         label: '',
                         exec: async (ctx) => {
-                            wallet.sendAndListen('eth_accounts', [], {
-                                result: (op, { type, data }) => {
-                                    this._currentAddress = data[0];
-                                }
-                            });
 
                             const contractAddress = await Core.storage.get('contractAddress');
                             const oracleAddress = await Core.storage.get('oracleAddress');
 
                             this._overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, {
                                 'sign_prove': (op, { type, message }) => {
-                                    wallet.sendAndListen('personal_sign', [message, this._currentAddress], {
+                                    wallet.sendAndListen('eth_accounts', [], {
                                         result: (op, { type, data }) => {
-                                            this._currentProve = data;
-                                            this._overlay.send('prove_signed', this._currentProve);
+                                            this._currentAddress = data[0];
+                                            wallet.sendAndListen('personal_sign', [message, this._currentAddress], {
+                                                result: (op, { type, data }) => {
+                                                    this._currentProve = data;
+                                                    this._overlay.send('prove_signed', this._currentProve);
+                                                }
+                                            });
                                         }
                                     });
                                 },
-                                'get_account': () => this._overlay.send('current_account', this._currentAddress),
+                                'get_account': () => {
+                                    wallet.sendAndListen('eth_accounts', [], {
+                                        result: (op, { type, data }) => {
+                                            this._currentAddress = data[0];
+                                            this._overlay.send('current_account', this._currentAddress);
+                                        }
+                                    });
+                                },
                                 'send_transaction': (op, { type, message }) => {
                                     wallet.sendAndListen('eth_sendTransaction', [message], {
                                         result: (op, { type, data }) => {
