@@ -116,6 +116,7 @@ export default class Feature {
                                         }
                                     });
                                 },
+                                'sign_prove_2': (message) => wallet.getAccounts().then(a => wallet.pesonalSign(message, a[0])),
                                 'get_account': () => {
                                     wallet.sendAndListen('eth_accounts', [], {
                                         result: (op, { type, data }) => {
@@ -131,12 +132,16 @@ export default class Feature {
                                 //         }
                                 //     });
                                 // },
+                                'callContract': (_, { message }) => this._contract[message.method](...message.args).then(tx => tx.wait()).then(() => this._overlay.send('???')),
+
+
                                 'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
                                 'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
                                 'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('createClaim_done')),
                                 'cancelClaim': (_, { message }) => this._contract.cancelClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('cancelClaim_done')),
                                 'approveClaim': (_, { message }) => this._contract.approveClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('approveClaim_done')),
                                 'rejectClaim': (_, { message }) => this._contract.rejectClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('rejectClaim_done')),
+                                'addAccount_2': (oldAccount, newAccount) => this._contract.addAccount(oldAccount, newAccount).then(tx => tx.wait())
                             });
                         }
                     }
