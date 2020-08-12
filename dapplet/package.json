@@ -21,7 +21,5 @@
     "tslib": "^1.11.2",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-    "ethers": "^4.0.47"
-  }
+  "dependencies": {}
 }

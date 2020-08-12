@@ -1,6 +1,7 @@
 import * as ethers from 'ethers';
 import abi from './abi';
 import { DappletSigner } from './dappletSigner';
+import { dappletInstance } from '../../dappletBus';
 
 export enum AccountStatus {
     NoIssues,
@@ -44,44 +45,37 @@ export class IdentityService {
     private _contract: ethers.Contract;
 
     constructor(contractAddress: string) {
-        const signer = new DappletSigner();
+        const signer = ethers.getDefaultProvider('rinkeby'); //new DappletSigner();
         this._contract = new ethers.Contract(contractAddress, abi, signer);
     }
 
-    getAccounts(account: Account): Promise<Account[]> {
+    async getAccounts(account: Account): Promise<Account[]> {
         return this._contract.getAccounts(account);
     }
 
     async addAccount(oldAccount: Account, newAccount: Account) {
-        const tx = await this._contract.addAccount(oldAccount, newAccount);
-        await tx.wait();
+        return dappletInstance.call('addAccount', [oldAccount, newAccount], 'addAccount_done');
     }
 
     async removeAccount(oldAccount: Account, newAccount: Account) {
-        const tx = await this._contract.removeAccount(oldAccount, newAccount);
-        await tx.wait();
+        return dappletInstance.call('removeAccount', [oldAccount, newAccount], 'removeAccount_done');
     }
 
     async createClaim(claimTypes: number, link: string | null, account: Account, oracle: string) {
         const linkBytes = link ? '0x' + link : '0x0';
-        const tx = await this._contract.createClaim(claimTypes, linkBytes, account, oracle); // signing
-        // ToDo: show signing in UI
-        await tx.wait(); // mining
+        return dappletInstance.call('createClaim', [claimTypes, linkBytes, account, oracle], 'createClaim_done');
     }
 
     async cancelClaim(id: number) {
-        const tx = await this._contract.cancelClaim(id);
-        await tx.wait();
+        return dappletInstance.call('cancelClaim', [id], 'cancelClaim_done');
     }
 
     async approveClaim(id: number) {
-        const tx = await this._contract.approveClaim(id);
-        await tx.wait();
+        return dappletInstance.call('approveClaim', [id], 'approveClaim_done');
     }
 
     async rejectClaim(id: number) {
-        const tx = await this._contract.rejectClaim(id);
-        await tx.wait();
+        return dappletInstance.call('rejectClaim', [id], 'rejectClaim_done');
     }
 
     async getClaimsByAccount(account: Account): Promise<Claim[]> {

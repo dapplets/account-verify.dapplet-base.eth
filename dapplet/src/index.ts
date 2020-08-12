@@ -1,6 +1,5 @@
 import abi from './abi';
-import ethers from 'ethers';
-import { IFeature } from '@dapplets/dapplet-extension';
+import {} from '@dapplets/dapplet-extension';
 import ICON_DAPPLET from './icons/dapplet.png';
 import ICON_GREEN from './icons/green.svg';
 import ICON_ORANGE from './icons/orange.png';
@@ -22,7 +21,7 @@ type Account = {
 export default class Feature {
     private _currentProve: string = null;
     private _currentAddress: string = null;
-    private _contract: ethers.Contract;
+    private _contract: any;
     private _accounts = new Map<string, Promise<Account[]>>();
     private _overlay;
     private _activeMessageIds = [];
@@ -125,13 +124,19 @@ export default class Feature {
                                         }
                                     });
                                 },
-                                'send_transaction': (op, { type, message }) => {
-                                    wallet.sendAndListen('eth_sendTransaction', [message], {
-                                        result: (op, { type, data }) => {
-                                            this._overlay.send('transaction_result', data);
-                                        }
-                                    });
-                                }
+                                // 'send_transaction': (op, { type, message }) => {
+                                //     wallet.sendAndListen('eth_sendTransaction', [message], {
+                                //         result: (op, { type, data }) => {
+                                //             this._overlay.send('transaction_result', data);
+                                //         }
+                                //     });
+                                // },
+                                'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
+                                'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
+                                'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('createClaim_done')),
+                                'cancelClaim': (_, { message }) => this._contract.cancelClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('cancelClaim_done')),
+                                'approveClaim': (_, { message }) => this._contract.approveClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('approveClaim_done')),
+                                'rejectClaim': (_, { message }) => this._contract.rejectClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('rejectClaim_done')),
                             });
                         }
                     }
@@ -160,12 +165,12 @@ export default class Feature {
     }
 
     private async _getAccounts(account: { domainId: number, name: string }): Promise<Account[]> {
+        if (!account.name) return [];
         account.name = account.name.toLowerCase();
         
         if (!this._contract) {
             const contractAddress = await Core.storage.get('contractAddress');
-            const provider = ethers.getDefaultProvider('rinkeby');
-            this._contract = new ethers.Contract(contractAddress, abi, provider);
+            this._contract = Core.contract(contractAddress, abi);
         }
 
         const key = `${account.domainId}/${account.name}`;
@@ -189,5 +194,6 @@ export default class Feature {
         } else if (accounts[0].status == 2) {
             return [{ uuid: key, text: 'Account mimics another one or produces too many scams' }];
         }
+        return [];
     }
 }

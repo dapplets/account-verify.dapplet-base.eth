@@ -29,41 +29,26 @@ class DappletBus extends Bus {
     }
 
     async signProve(prove: UnsignedProve): Promise<SignedProve> {
-        return new Promise((res, rej) => {
-            this.publish(this._subId.toString(), {
-                type: 'sign_prove',
-                message: prove
-            });
-            this.subscribe('prove_signed', (data: any) => {
-                this.unsubscribe('prove_signed');
-                res(data);
-                // ToDo: add reject call
-            });
-        });
+        return this.call('sign_prove', prove, 'prove_signed');
     }
 
     async getAccount(): Promise<string> {
-        return new Promise((res, rej) => {
-            this.publish(this._subId.toString(), {
-                type: 'get_account'
-            });
-            this.subscribe('current_account', (data: any) => {
-                this.unsubscribe('current_account');
-                res(data);
-                // ToDo: add reject call
-            });
-        });
+        return this.call('get_account', null, 'current_account');
     }
 
     async sendTransaction(tx: any): Promise<string> {
+        return this.call('send_transaction', tx, 'transaction_result');
+    }
+
+    public async call(method: string, args: any, callbackEvent: string): Promise<any> {
         return new Promise((res, rej) => {
             this.publish(this._subId.toString(), {
-                type: 'send_transaction',
-                message: tx
+                type: method,
+                message: args
             });
-            this.subscribe('transaction_result', (txHash: any) => {
-                this.unsubscribe('transaction_result');
-                res(txHash);
+            this.subscribe(callbackEvent, (result: any) => {
+                this.unsubscribe(callbackEvent);
+                res(result);
                 // ToDo: add reject call
             });
         });
