@@ -133,7 +133,14 @@ export default class Feature {
                                 //     });
                                 // },
                                 'callContract': (_, { message }) => this._contract[message.method](...message.args).then(tx => tx.wait()).then(() => this._overlay.send('???')),
-
+                                'callContract_2': (_, { message }) => {
+                                    const allowedMethods = ['addAccount', 'removeAccount', 'createClaim', 'cancelClaim', 'approveClaim', 'rejectClaim'];
+                                    if (allowedMethods.includes(message.method)) {
+                                        this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('callContract_done'));
+                                    } else {
+                                        this._overlay.send('callContract_error');
+                                    }                                    
+                                },
 
                                 'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
                                 'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
