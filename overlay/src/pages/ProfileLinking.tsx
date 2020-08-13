@@ -9,7 +9,7 @@ import { Header } from '../components/Header';
 import { Profile, dappletInstance, Settings } from '../dappletBus';
 import { EnsService } from '../services/ensService';
 import { findEnsNames } from '../helpers';
-import { IdentityService } from '../services/identityService';
+import { IdentityService, Account } from '../services/identityService';
 
 //import './ProfileLinking.css';
 
@@ -44,10 +44,13 @@ interface IState {
   selectedDomains: string[];
   preferedDomain: string;
   currentAccount: string;
+  linkedAccounts: Account[];
   loading: boolean;
 }
 
 export class ProfileLinking extends React.Component<IProps, IState> {
+
+  private _identityService: IdentityService;
 
   constructor(props: IProps) {
     super(props);
@@ -60,10 +63,13 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       availableDomains: [],
       unavailableDomains: [],
       selectedDomains: [],
+      linkedAccounts: [],
       preferedDomain: '',
       currentAccount: '',
       loading: true
     }
+
+    this._identityService = new IdentityService(this.props.context.contractAddress);
   }
 
   async componentDidMount() {
@@ -75,11 +81,15 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     const domainFromUsername = `${profile.authorUsername}.eth`;
     const domainsForChecking = [...domainsFromFullname, domainFromUsername];
     const unavailableDomains = await Promise.all(domainsForChecking.map(d => ensService.getRegistrant(d).then(o => ({ name: d, owner: o }))));
+    const linkedAccounts = await this._identityService.getAccounts({
+      domainId: 1,
+      name: this.props.context.authorUsername.toLowerCase()
+    });
 
     const account = await dappletInstance.getAccount();
     const availableDomains = await ensService.getDomains(account);
 
-    this.setState({ availableDomains, unavailableDomains, currentAccount: account, loading: false });
+    this.setState({ availableDomains, unavailableDomains, currentAccount: account, linkedAccounts, loading: false });
   }
 
   setStage(stage: Stages) {
@@ -156,9 +166,10 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                 {this.state.availableDomains.map((domain, key) => (
                   <Form.Field key={key}>
                     <Checkbox
-                      label={domain}
+                      label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)`: domain}
                       style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
-                      checked={this.state.selectedDomains.includes(domain)}
+                      checked={this.state.selectedDomains.includes(domain) || this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
+                      disabled={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
                       onChange={(e, data) => {
                         if (data.checked) {
                           this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
