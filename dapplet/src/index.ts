@@ -1,5 +1,5 @@
 import abi from './abi';
-import {} from '@dapplets/dapplet-extension';
+import { } from '@dapplets/dapplet-extension';
 import ICON_DAPPLET from './icons/dapplet.png';
 import ICON_GREEN from './icons/green.svg';
 import ICON_ORANGE from './icons/orange.png';
@@ -83,7 +83,7 @@ export default class Feature {
                         const messages: Msg[] = await this._getMessages({ domainId: 1, name: after.authorUsername });
                         messages.forEach(m => {
                             statusLine.addMessage({
-                                uuid: m.uuid, 
+                                uuid: m.uuid,
                                 text: m.text
                             });
                             this._activeMessageIds.push(m.uuid);
@@ -98,7 +98,6 @@ export default class Feature {
                         img: ICON_DAPPLET,
                         label: '',
                         exec: async (ctx) => {
-
                             const contractAddress = await Core.storage.get('contractAddress');
                             const oracleAddress = await Core.storage.get('oracleAddress');
 
@@ -124,13 +123,6 @@ export default class Feature {
                                         }
                                     });
                                 },
-                                // 'send_transaction': (op, { type, message }) => {
-                                //     wallet.sendAndListen('eth_sendTransaction', [message], {
-                                //         result: (op, { type, data }) => {
-                                //             this._overlay.send('transaction_result', data);
-                                //         }
-                                //     });
-                                // },
                                 'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
                                 'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
                                 'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('createClaim_done')),
@@ -167,7 +159,7 @@ export default class Feature {
     private async _getAccounts(account: { domainId: number, name: string }): Promise<Account[]> {
         if (!account.name) return [];
         account.name = account.name.toLowerCase();
-        
+
         if (!this._contract) {
             const contractAddress = await Core.storage.get('contractAddress');
             this._contract = Core.contract(contractAddress, abi);
