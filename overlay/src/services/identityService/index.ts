@@ -62,7 +62,7 @@ export class IdentityService {
     }
 
     async createClaim(claimTypes: number, link: string | null, account: Account, oracle: string) {
-        const linkBytes = link ? '0x' + link : '0x0';
+        const linkBytes = link ? '0x' + link : '0x00';
         return dappletInstance.call('createClaim', [claimTypes, linkBytes, account, oracle], 'createClaim_done');
     }
 
