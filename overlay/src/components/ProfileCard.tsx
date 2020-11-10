@@ -21,7 +21,7 @@ export class ProfileCard extends React.Component<IProps, IState> {
                         src={this.props.profile.authorImg}
                     />
                     <Card.Header>{this.props.profile.authorFullname}</Card.Header>
-                    <Card.Meta>{this.props.profile.authorUsername}</Card.Meta>
+                    <Card.Meta>@{this.props.profile.authorUsername}</Card.Meta>
                 </Card.Content>
             </Card>
         );

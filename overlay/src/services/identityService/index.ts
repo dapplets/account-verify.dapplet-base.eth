@@ -10,9 +10,9 @@ export enum AccountStatus {
 }
 
 export enum ClaimStatus {
-    InProgress, 
-    Approved, 
-    Rejected, 
+    InProgress,
+    Approved,
+    Rejected,
     Canceled
 }
 
@@ -89,7 +89,7 @@ export class IdentityService {
     async getClaimsByOracle(oracle: string): Promise<Claim[]> {
         const [claims, indexes] = await this._contract.getClaimsByOracle(oracle);
         claims.forEach((c: Claim, i: number) => c.id = indexes[i].toNumber());
-        claims.forEach((c: Claim) => c.link = (c.link === null  || c.link === '0x' || c.link === '0x0' || c.link === '0x00') ? null : c.link.substring(2));
+        claims.forEach((c: Claim) => c.link = (c.link === null || c.link === '0x' || c.link === '0x0' || c.link === '0x00') ? null : c.link.substring(2));
         claims.forEach((c: any) => c.timestamp = new Date(c.timestamp.toNumber() * 1000));
         return claims;
     }

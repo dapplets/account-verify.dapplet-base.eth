@@ -166,7 +166,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                 {this.state.availableDomains.map((domain, key) => (
                   <Form.Field key={key}>
                     <Checkbox
-                      label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)`: domain}
+                      label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)` : domain}
                       style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
                       checked={this.state.selectedDomains.includes(domain) || this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
                       disabled={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
