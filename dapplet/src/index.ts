@@ -24,6 +24,7 @@ export default class Feature {
     private _accounts = new Map<string, Promise<Account[]>>();
     private _overlay;
     private _activeMessageIds = [];
+    private _onPostStartedHandler: (ctx: any) => void = null;
 
     constructor(
         @Inject("identity-adapter.dapplet-base.eth")
@@ -32,10 +33,16 @@ export default class Feature {
         @Inject("common-adapter.dapplet-base.eth")
         public viewportAdapter: any
     ) {
-        const wallet = Core.wallet();
-        Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Identity Management' }));
+        Core.storage.get('overlayUrl').then(url => {
+            this._overlay = Core.overlay({ url, title: 'Identity Management' });
+            this._configure();
+        });
+    }
 
-        const { statusLine } = viewportAdapter.exports;
+    private _configure() {
+        const wallet = Core.wallet();
+
+        const { statusLine } = this.viewportAdapter.exports;
         const { badge, button } = this.identityAdapter.exports;
 
         const badgeConfig = ({
@@ -119,6 +126,14 @@ export default class Feature {
                                         }
                                     });
                                 },
+                                'wait_prove': (op, { type, message }) => {
+                                    this._onPostStartedHandler = (ctx) => {
+                                        if (ctx.authorUsername === message.username && ctx.text.indexOf(message.prove) !== -1) {
+                                            this._onPostStartedHandler = null;
+                                            this._overlay.send('prove_published', ctx);
+                                        }
+                                    }
+                                },
                                 'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
                                 'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
                                 'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('createClaim_done')),
@@ -135,7 +150,7 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         hidden: true,
-                        init: (ctx) => this._overlay.send('post_started', ctx)
+                        init: (ctx) => this._onPostStartedHandler?.(ctx)
                     }
                 })
             ],

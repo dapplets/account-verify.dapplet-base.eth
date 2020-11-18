@@ -104,23 +104,22 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       this.setState({ signedProve });
       this.setStage(Stages.ProvePost);
 
-      dappletInstance.onPostStarted(async (post) => {
-        if (post.authorUsername === this.props.context.authorUsername && post.text.indexOf(this.state.signedProve) !== -1) {
-          const proveUrl = `https://twitter.com/${post.authorUsername}/status/${post.id}`;
-          this.setState({ proveUrl });
-          const identityService = new IdentityService(this.props.context.contractAddress);
-          const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
-          const newAccount = { domainId: 2, name: selectedDomain };
-          this.setStage(Stages.TxWaiting);
+      // Waiting of prove publishing
+      const post = await dappletInstance.waitProve(this.props.context.authorUsername, this.state.signedProve);
 
-          try {
-            await identityService.addAccount(currentAccount, newAccount);
-            this.setStage(Stages.SuccessLinking);
-          } catch (err) {
-            this.setStage(Stages.TxFailure);
-          }
-        }
-      });
+      const proveUrl = `https://twitter.com/${post.authorUsername}/status/${post.id}`;
+      this.setState({ proveUrl });
+      const identityService = new IdentityService(this.props.context.contractAddress);
+      const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
+      const newAccount = { domainId: 2, name: selectedDomain };
+      this.setStage(Stages.TxWaiting);
+
+      try {
+        await identityService.addAccount(currentAccount, newAccount);
+        this.setStage(Stages.SuccessLinking);
+      } catch (err) {
+        this.setStage(Stages.TxFailure);
+      }
 
     } catch (err) {
       this.setStage(Stages.SignFailure);

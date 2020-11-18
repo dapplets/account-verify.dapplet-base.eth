@@ -32,8 +32,8 @@ class DappletBus extends Bus {
         });
     }
 
-    onPostStarted(callback: (post: Post) => void) {
-        this.subscribe('post_started', callback);
+    async waitProve(username: string, prove: SignedProve): Promise<Post> {
+        return this.call('wait_prove', { username, prove }, 'prove_published');
     }
 
     async signProve(prove: UnsignedProve): Promise<SignedProve> {
