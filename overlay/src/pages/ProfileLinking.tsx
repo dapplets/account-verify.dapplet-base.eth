@@ -248,7 +248,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <ProvePost message={this.state.signedProve} />
+          <ProvePost message={this.state.signedProve} context={this.props.context}/>
         </Segment>
       </React.Fragment>
     );
