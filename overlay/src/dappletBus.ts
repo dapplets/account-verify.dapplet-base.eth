@@ -11,6 +11,14 @@ export type Settings = {
     oracleAddress: string;
 }
 
+export type Post = {
+    id: string;
+    text: string;
+    authorUsername: string;
+    authorFullname: string;
+    authorImg: string;
+}
+
 export type UnsignedProve = string;
 export type SignedProve = string;
 
@@ -24,8 +32,8 @@ class DappletBus extends Bus {
         });
     }
 
-    onProvePublished(callback: (proveUrl: string) => void) {
-        this.subscribe('prove_published', callback);
+    onPostStarted(callback: (post: Post) => void) {
+        this.subscribe('post_started', callback);
     }
 
     async signProve(prove: UnsignedProve): Promise<SignedProve> {

@@ -19,7 +19,6 @@ type Account = {
 
 @Injectable
 export default class Feature {
-    private _currentProve: string = null;
     private _currentAddress: string = null;
     private _contract: any;
     private _accounts = new Map<string, Promise<Account[]>>();
@@ -107,10 +106,7 @@ export default class Feature {
                                         result: (op, { type, data }) => {
                                             this._currentAddress = data[0];
                                             wallet.sendAndListen('personal_sign', [message, this._currentAddress], {
-                                                result: (op, { type, data }) => {
-                                                    this._currentProve = data;
-                                                    this._overlay.send('prove_signed', this._currentProve);
-                                                }
+                                                result: (op, { type, data }) => this._overlay.send('prove_signed', data)
                                             });
                                         }
                                     });
@@ -139,11 +135,7 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         hidden: true,
-                        init: (ctx) => {
-                            if (this._currentProve !== null && this._currentProve === ctx.text) {
-                                this._overlay.send('prove_published', `https://twitter.com/${ctx.authorUsername}/status/${ctx.id}`);
-                            }
-                        }
+                        init: (ctx) => this._overlay.send('post_started', ctx)
                     }
                 })
             ],

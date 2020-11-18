@@ -103,20 +103,25 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       const signedProve = await dappletInstance.signProve(selectedDomain);
       this.setState({ signedProve });
       this.setStage(Stages.ProvePost);
-      dappletInstance.onProvePublished(async proveUrl => {
-        this.setState({ proveUrl });
-        const identityService = new IdentityService(this.props.context.contractAddress);
-        const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
-        const newAccount = { domainId: 2, name: selectedDomain };
-        this.setStage(Stages.TxWaiting);
 
-        try {
-          await identityService.addAccount(currentAccount, newAccount);
-          this.setStage(Stages.SuccessLinking);
-        } catch (err) {
-          this.setStage(Stages.TxFailure);
+      dappletInstance.onPostStarted(async (post) => {
+        if (post.authorUsername === this.props.context.authorUsername && post.text.indexOf(this.state.signedProve) !== -1) {
+          const proveUrl = `https://twitter.com/${post.authorUsername}/status/${post.id}`;
+          this.setState({ proveUrl });
+          const identityService = new IdentityService(this.props.context.contractAddress);
+          const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
+          const newAccount = { domainId: 2, name: selectedDomain };
+          this.setStage(Stages.TxWaiting);
+
+          try {
+            await identityService.addAccount(currentAccount, newAccount);
+            this.setStage(Stages.SuccessLinking);
+          } catch (err) {
+            this.setStage(Stages.TxFailure);
+          }
         }
       });
+
     } catch (err) {
       this.setStage(Stages.SignFailure);
     }
@@ -248,7 +253,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
           onBack={() => this.setStage(Stages.ProfileSelect)}
         />
         <Segment>
-          <ProvePost message={this.state.signedProve} context={this.props.context}/>
+          <ProvePost message={this.state.signedProve} context={this.props.context} />
         </Segment>
       </React.Fragment>
     );
