@@ -182,10 +182,10 @@ export class Claims extends React.Component<IProps, IState> {
                         </Card.Description>
                       </Card.Content>
                       {(a.status === ClaimStatus.InProgress) ? <Card.Content extra>
-                        {(this.state.account) ? <div className={(this.state.account === a.oracle && this.state.account === a.author) ? 'ui three buttons' : ((this.state.account === a.oracle) ? 'ui two buttons' : 'ui one buttons')}>
-                          {(this.state.account === a.oracle) ? <Button basic color='green' onClick={() => this._approveClaim(a.id)}>Approve</Button> : null}
-                          {(this.state.account === a.oracle) ? <Button basic color='red' onClick={() => this._rejectClaim(a.id)}>Reject</Button> : null}
-                          {(this.state.account === a.author) ? <Button basic color='blue' onClick={() => this._cancelClaim(a.id)}>Cancel</Button> : null}
+                        {(this.state.account) ? <div className={(this.state.account.toLowerCase() === a.oracle.toLowerCase() && this.state.account.toLowerCase() === a.author.toLowerCase()) ? 'ui three buttons' : ((this.state.account.toLowerCase() === a.oracle.toLowerCase()) ? 'ui two buttons' : 'ui one buttons')}>
+                          {(this.state.account.toLowerCase() === a.oracle.toLowerCase()) ? <Button basic color='green' onClick={() => this._approveClaim(a.id)}>Approve</Button> : null}
+                          {(this.state.account.toLowerCase() === a.oracle.toLowerCase()) ? <Button basic color='red' onClick={() => this._rejectClaim(a.id)}>Reject</Button> : null}
+                          {(this.state.account.toLowerCase() === a.author.toLowerCase()) ? <Button basic color='blue' onClick={() => this._cancelClaim(a.id)}>Cancel</Button> : null}
                         </div> : null}
                       </Card.Content> : null}
                     </Card>
