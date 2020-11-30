@@ -14,7 +14,7 @@
   },
   "homepage": "./",
   "scripts": {
-    "start": "BROWSER=none HTTPS=true react-scripts start",
+    "start": "cross-env BROWSER=none HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "swarm:setup": "erebos website:setup --name=\"identity.dapplet-base.eth\" --http-gateway=https://swarm-gateways.net",
     "swarm:upload": "SWARM_KEY=$(grep SWARM_KEY .env | cut -d '=' -f2) erebos website:publish --hash=$(grep SWARM_ADDRESS .env | cut -d '=' -f2) --key-env=SWARM_KEY ./build --http-gateway=https://swarm-gateways.net",
@@ -40,6 +40,7 @@
     "@types/node": "^12.12.38",
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
-    "@types/react-router-dom": "^5.1.5"
+    "@types/react-router-dom": "^5.1.5",
+    "cross-env": "^7.0.2"
   }
 }
