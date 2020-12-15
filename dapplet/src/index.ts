@@ -25,6 +25,7 @@ export default class Feature {
     private _overlay;
     private _activeMessageIds = [];
     private _onPostStartedHandler: (ctx: any) => void = null;
+    private _wallet: any;
 
     constructor(
         @Inject("identity-adapter.dapplet-base.eth")
@@ -40,8 +41,6 @@ export default class Feature {
     }
 
     private _configure() {
-        const wallet = Core.wallet();
-
         const { statusLine } = this.viewportAdapter.exports;
         const { badge, button } = this.identityAdapter.exports;
 
@@ -106,6 +105,7 @@ export default class Feature {
                         exec: async (ctx) => {
                             const contractAddress = await Core.storage.get('contractAddress');
                             const oracleAddress = await Core.storage.get('oracleAddress');
+                            const wallet = await this._getWallet();
 
                             this._overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, {
                                 'sign_prove': (op, { type, message }) => {
@@ -194,5 +194,9 @@ export default class Feature {
             return [{ uuid: key, text: 'Account mimics another one or produces too many scams' }];
         }
         return [];
+    }
+
+    private async _getWallet() {
+        return this._wallet ?? await Promise.resolve(Core.wallet());
     }
 }
