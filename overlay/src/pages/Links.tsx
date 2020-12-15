@@ -56,7 +56,7 @@ export class Links extends React.Component<IProps, IState> {
   }
 
   private _domainIdToName(domainId: number) {
-    const map = [undefined, 'Twitter', 'ENS'];
+    const map = [undefined, 'Twitter', 'ENS', 'Ethereum'];
     return map[domainId] || 'Unknown';
   }
 
@@ -102,12 +102,12 @@ export class Links extends React.Component<IProps, IState> {
           (this.state.accounts.length === 0) ? (
             <p>You have no linked accounts yet.</p>
           ) : (
-              <Table unstackable>
+              <Table unstackable fixed>
                 <Table.Header>
                   <Table.Row>
-                    <Table.HeaderCell>Type</Table.HeaderCell>
-                    <Table.HeaderCell>Address</Table.HeaderCell>
-                    <Table.HeaderCell>Actions</Table.HeaderCell>
+                    <Table.HeaderCell style={{ width: '25%' }}>Type</Table.HeaderCell>
+                    <Table.HeaderCell style={{ width: '50%' }}>Address</Table.HeaderCell>
+                    <Table.HeaderCell style={{ width: '25%' }}>Actions</Table.HeaderCell>
                   </Table.Row>
                 </Table.Header>
 
@@ -115,7 +115,7 @@ export class Links extends React.Component<IProps, IState> {
                   {this.state.accounts.map((a, key) => (
                     <Table.Row key={key}>
                       <Table.Cell>{this._domainIdToName(a.domainId)}</Table.Cell>
-                      <Table.Cell>{a.name}</Table.Cell>
+                      <Table.Cell style={{ overflowWrap: 'break-word' }}>{a.name}</Table.Cell>
                       <Table.Cell>
                         <Button size='mini' onClick={() => this._unlinkAccount(a)}>Unlink</Button>
                       </Table.Cell>

@@ -111,7 +111,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       this.setState({ proveUrl });
       const identityService = new IdentityService(this.props.context.contractAddress);
       const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
-      const newAccount = { domainId: 2, name: selectedDomain };
+      const newAccount = { domainId: (selectedDomain.indexOf('.eth') !== -1 ? 2 : 3), name: selectedDomain };
       this.setStage(Stages.TxWaiting);
 
       try {
@@ -162,30 +162,48 @@ export class ProfileLinking extends React.Component<IProps, IState> {
             to post in the format <b>"Dapplet-Confirmation yourname.eth"</b>
             or <b>Your profile name must contain your ENS</b>.</p>
 
-          <p>The following addresses are available for linking in your account: {this.state.currentAccount}:</p>
-
           {(this.state.loading) ? (<Loader inline active size='mini' />) : (
-            (this.state.unavailableDomains.length > 0) ? (
-              <Form>
-                {this.state.availableDomains.map((domain, key) => (
-                  <Form.Field key={key}>
+            <>
+              {(this.state.availableDomains.length > 0)
+                ? <p>The following addresses are available for linking in your account: {this.state.currentAccount}:</p>
+                : <p>No addresses available for linkng.</p>}
+
+              {(this.state.unavailableDomains.length > 0) ? (
+                <Form>
+                  {this.state.availableDomains.map((domain, key) => (
+                    <Form.Field key={key}>
+                      <Checkbox
+                        label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)` : domain}
+                        style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
+                        checked={this.state.selectedDomains.includes(domain) || this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
+                        disabled={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
+                        onChange={(e, data) => {
+                          if (data.checked) {
+                            this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
+                          } else {
+                            this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
+                          }
+                        }}
+                      />
+                    </Form.Field>
+                  ))}
+                  <Form.Field>
                     <Checkbox
-                      label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)` : domain}
-                      style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
-                      checked={this.state.selectedDomains.includes(domain) || this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
-                      disabled={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
+                      label={(!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())) ? `${this.state.currentAccount} (already linked)` : this.state.currentAccount}
+                      checked={this.state.selectedDomains.includes(this.state.currentAccount) || !!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
+                      disabled={!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
                       onChange={(e, data) => {
                         if (data.checked) {
-                          this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
+                          this.setState({ selectedDomains: [...this.state.selectedDomains, this.state.currentAccount] });
                         } else {
-                          this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
+                          this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== this.state.currentAccount) });
                         }
                       }}
                     />
                   </Form.Field>
-                ))}
-              </Form>
-            ) : (<p>You do not have your own ens names. Register at least one to continue.</p>)
+                </Form>
+              ) : (<p>You do not have your own ens names. Register at least one to continue.</p>)}
+            </>
           )}
 
           {(this.state.unavailableDomains.length > 0) ? (
