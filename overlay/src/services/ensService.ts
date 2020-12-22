@@ -13,7 +13,7 @@ export class EnsService {
         };
         const response = await fetch('https://api.thegraph.com/subgraphs/name/ensdomains/ensrinkeby', { method: 'POST', body: JSON.stringify(body) });
         const json = await response.json();
-        return json.data?.account?.registrations?.map((x: any) => x.domain?.name) || [];
+        return json.data?.account?.registrations?.map((x: any) => x.domain?.name?.toLowerCase()) || [];
     }
 
     async getRegistrant(domain: string): Promise<string> {

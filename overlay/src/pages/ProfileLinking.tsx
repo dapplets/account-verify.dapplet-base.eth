@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect } from "react-router-dom";
-import { Segment, Button, Checkbox, Form, Loader } from 'semantic-ui-react';
+import { Segment, Button, Checkbox, Form, Loader, Radio } from 'semantic-ui-react';
 import { ProfileCard } from '../components/ProfileCard';
 import { TxWaiting } from '../components/TxWaiting';
 import { TxFailure } from '../components/TxFailure';
@@ -89,7 +89,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     const account = await dappletInstance.getAccount();
     const availableDomains = await ensService.getDomains(account);
 
-    this.setState({ availableDomains, unavailableDomains, currentAccount: account, linkedAccounts, loading: false });
+    this.setState({ availableDomains, unavailableDomains, currentAccount: account, linkedAccounts: linkedAccounts.map(x => ({ domainId: x.domainId, name: x.name })), loading: false });
   }
 
   setStage(stage: Stages) {
@@ -100,7 +100,9 @@ export class ProfileLinking extends React.Component<IProps, IState> {
     this.setStage(Stages.SignWaiting);
     try {
       const selectedDomain = this.state.selectedDomains[0].toLowerCase();
-      const signedProve = await dappletInstance.signProve(selectedDomain);
+      const domainId = (selectedDomain.indexOf('.eth') !== -1 ? 2 : 3);
+      const message = `${domainId}:${selectedDomain}`;
+      const signedProve = await dappletInstance.signProve(message);
       this.setState({ signedProve });
       this.setStage(Stages.ProvePost);
 
@@ -111,7 +113,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
       this.setState({ proveUrl });
       const identityService = new IdentityService(this.props.context.contractAddress);
       const currentAccount = { domainId: 1, name: this.props.context.authorUsername.toLowerCase() };
-      const newAccount = { domainId: (selectedDomain.indexOf('.eth') !== -1 ? 2 : 3), name: selectedDomain };
+      const newAccount = { domainId, name: selectedDomain };
       this.setStage(Stages.TxWaiting);
 
       try {
@@ -172,33 +174,21 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                 <Form>
                   {this.state.availableDomains.map((domain, key) => (
                     <Form.Field key={key}>
-                      <Checkbox
+                      <Radio
                         label={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain) ? `${domain} (already linked)` : domain}
                         style={(this.state.preferedDomain === domain) ? { fontWeight: 800 } : {}}
                         checked={this.state.selectedDomains.includes(domain) || this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
                         disabled={this.state.linkedAccounts.filter(a => a.domainId === 2).map(a => a.name).includes(domain)}
-                        onChange={(e, data) => {
-                          if (data.checked) {
-                            this.setState({ selectedDomains: [...this.state.selectedDomains, domain] });
-                          } else {
-                            this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== domain) });
-                          }
-                        }}
+                        onChange={() => this.setState({ selectedDomains: [domain] })}
                       />
                     </Form.Field>
                   ))}
                   <Form.Field>
-                    <Checkbox
+                    <Radio
                       label={(!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())) ? `${this.state.currentAccount} (already linked)` : this.state.currentAccount}
                       checked={this.state.selectedDomains.includes(this.state.currentAccount) || !!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
                       disabled={!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
-                      onChange={(e, data) => {
-                        if (data.checked) {
-                          this.setState({ selectedDomains: [...this.state.selectedDomains, this.state.currentAccount] });
-                        } else {
-                          this.setState({ selectedDomains: this.state.selectedDomains.filter(d => d !== this.state.currentAccount) });
-                        }
-                      }}
+                      onChange={() => this.setState({ selectedDomains: [this.state.currentAccount.toLowerCase()] })}
                     />
                   </Form.Field>
                 </Form>
@@ -213,7 +203,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                 <Form.Field>Also there are some addresses which are similar with your username, but are owned by another account:</Form.Field>
                 {this.state.unavailableDomains.map((domain, key) => (
                   <Form.Field key={key}>
-                    <Checkbox label={`${domain.name} (${(domain.owner) ? `owned by ${domain.owner}` : 'available'})`} disabled />
+                    <Radio label={`${domain.name} (${(domain.owner) ? `owned by ${domain.owner}` : 'available'})`} disabled />
                   </Form.Field>
                 ))}
               </Form>

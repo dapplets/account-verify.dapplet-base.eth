@@ -27,6 +27,7 @@ class DappletBus extends Bus {
 
     onProfileSelect(callback: (profile: Profile & Settings) => void) {
         this.subscribe('profile_select', (profile: Profile & Settings) => {
+            profile.authorUsername = profile.authorUsername.toLowerCase();
             callback(profile);
             return (++this._subId).toString();
         });

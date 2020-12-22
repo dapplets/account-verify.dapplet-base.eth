@@ -34,10 +34,7 @@ export default class Feature {
         @Inject("common-adapter.dapplet-base.eth")
         public viewportAdapter: any
     ) {
-        Core.storage.get('overlayUrl').then(url => {
-            this._overlay = Core.overlay({ url, title: 'Identity Management' });
-            this._configure();
-        });
+        this._configure();
     }
 
     private _configure() {
@@ -103,17 +100,25 @@ export default class Feature {
                         img: ICON_DAPPLET,
                         label: '',
                         exec: async (ctx) => {
+                            /*
+                                ToDo:
+                                Here is a new overlay is creating everytime, when the button is clicked, because
+                                it's not clear how to unsubscribe from events below.
+                            */
+                            const url = await Core.storage.get('overlayUrl');
+                            const overlay = Core.overlay({ url, title: 'Identity Management' });
+
                             const contractAddress = await Core.storage.get('contractAddress');
                             const oracleAddress = await Core.storage.get('oracleAddress');
                             const wallet = await this._getWallet();
 
-                            this._overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, {
+                            overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, {
                                 'sign_prove': (op, { type, message }) => {
                                     wallet.sendAndListen('eth_accounts', [], {
                                         result: (op, { type, data }) => {
                                             this._currentAddress = data[0];
                                             wallet.sendAndListen('personal_sign', [message, this._currentAddress], {
-                                                result: (op, { type, data }) => this._overlay.send('prove_signed', data)
+                                                result: (op, { type, data }) => overlay.send('prove_signed', data)
                                             });
                                         }
                                     });
@@ -122,7 +127,7 @@ export default class Feature {
                                     wallet.sendAndListen('eth_accounts', [], {
                                         result: (op, { type, data }) => {
                                             this._currentAddress = data[0];
-                                            this._overlay.send('current_account', this._currentAddress);
+                                            overlay.send('current_account', this._currentAddress);
                                         }
                                     });
                                 },
@@ -130,16 +135,16 @@ export default class Feature {
                                     this._onPostStartedHandler = (ctx) => {
                                         if (ctx.authorUsername === message.username && ctx.text.indexOf(message.prove) !== -1) {
                                             this._onPostStartedHandler = null;
-                                            this._overlay.send('prove_published', ctx);
+                                            overlay.send('prove_published', ctx);
                                         }
                                     }
                                 },
-                                'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('addAccount_done')),
-                                'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => this._overlay.send('removeAccount_done')),
-                                'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('createClaim_done')),
-                                'cancelClaim': (_, { message }) => this._contract.cancelClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('cancelClaim_done')),
-                                'approveClaim': (_, { message }) => this._contract.approveClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('approveClaim_done')),
-                                'rejectClaim': (_, { message }) => this._contract.rejectClaim(...message).then(tx => tx.wait()).then(() => this._overlay.send('rejectClaim_done')),
+                                'addAccount': (_, { message }) => this._contract.addAccount(...message).then(tx => tx.wait()).then(() => overlay.send('addAccount_done')),
+                                'removeAccount': (_, { message }) => this._contract.removeAccount(...message).then(tx => tx.wait()).then(() => overlay.send('removeAccount_done')),
+                                'createClaim': (_, { message }) => this._contract.createClaim(...message).then(tx => tx.wait()).then(() => overlay.send('createClaim_done')),
+                                'cancelClaim': (_, { message }) => this._contract.cancelClaim(...message).then(tx => tx.wait()).then(() => overlay.send('cancelClaim_done')),
+                                'approveClaim': (_, { message }) => this._contract.approveClaim(...message).then(tx => tx.wait()).then(() => overlay.send('approveClaim_done')),
+                                'rejectClaim': (_, { message }) => this._contract.rejectClaim(...message).then(tx => tx.wait()).then(() => overlay.send('rejectClaim_done')),
                             });
                         }
                     }
@@ -197,6 +202,6 @@ export default class Feature {
     }
 
     private async _getWallet() {
-        return this._wallet ?? await Promise.resolve(Core.wallet());
+        return Promise.resolve(Core.wallet());
     }
 }
