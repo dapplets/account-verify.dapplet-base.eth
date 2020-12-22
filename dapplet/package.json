@@ -1,6 +1,6 @@
 {
   "name": "account-verify.dapplet-base.eth",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "description": "Connect your identities in social networks and crypto",
   "main": "lib/index.js",
   "scripts": {
