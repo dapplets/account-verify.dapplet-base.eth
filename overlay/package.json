@@ -17,7 +17,7 @@
     "start": "cross-env BROWSER=none HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "swarm:setup": "erebos website:setup --name=\"identity.dapplet-base.eth\" --http-gateway=https://swarm-gateways.net",
-    "swarm:upload": "cross-env SWARM_KEY=$(grep SWARM_KEY .env | cut -d '=' -f2) erebos website:publish --hash=$(grep SWARM_ADDRESS .env | cut -d '=' -f2) --key-env=SWARM_KEY ./build --http-gateway=https://swarm-gateways.net",
+    "swarm:upload": "env-cmd erebos website:publish --hash=273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1 --key-env=SWARM_KEY ./build --http-gateway=https://swarm-gateways.net",
     "deploy": "npm run build && npm run swarm:upload"
   },
   "eslintConfig": {
@@ -41,6 +41,7 @@
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "@types/react-router-dom": "^5.1.5",
-    "cross-env": "^7.0.2"
+    "cross-env": "^7.0.2",
+    "env-cmd": "^10.1.0"
   }
 }

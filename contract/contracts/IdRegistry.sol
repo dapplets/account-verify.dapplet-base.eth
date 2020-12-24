@@ -35,46 +35,80 @@ contract IdRegistry {
         bytes link; // swarm url
         address oracle;
         address author;
-        bytes32 accountIdx;
+        bytes32 accountKey;
         ClaimStatus status;
         uint timestamp;
     }
     
-    mapping(bytes32 => Account[]) public accounts;
+    Account[][] public accounts;
+    mapping(bytes32 => uint) public accountIdxs;
     mapping(bytes32 => uint[]) public claimIdxByAccount;
     mapping(address => uint[]) public claimIdxByOracle;
     Claim[] claims;
 
+    constructor() public {
+        accounts.push(); // lock zero index
+    }
+
     function addAccount(AccountDto memory oldAccount, AccountDto memory newAccount) public {
         bytes32 oldKey = keccak256(abi.encodePacked(oldAccount.domainId, oldAccount.name));
-        if (accounts[oldKey].length == 0) accounts[oldKey].push(Account(oldAccount.domainId, oldAccount.name, AccountStatus.NoIssues));
-        accounts[oldKey].push(Account(newAccount.domainId, newAccount.name, AccountStatus.NoIssues));
         bytes32 newKey = keccak256(abi.encodePacked(newAccount.domainId, newAccount.name));
-        accounts[newKey] = accounts[oldKey];
+        uint oldKeyIdx = accountIdxs[oldKey];
+        uint newKeyIdx = accountIdxs[newKey];
+
+        require(oldKeyIdx == 0 || newKeyIdx == 0, "Merging of two tuples is not implemented");
+
+        // new oldAccount
+        if (oldKeyIdx == 0 && newKeyIdx == 0) {
+            Account[] storage tuple = accounts.push();
+            tuple.push(Account(oldAccount.domainId, oldAccount.name, AccountStatus.NoIssues));
+            tuple.push(Account(newAccount.domainId, newAccount.name, AccountStatus.NoIssues));
+            oldKeyIdx = accounts.length - 1;
+            accountIdxs[oldKey] = oldKeyIdx;
+            accountIdxs[newKey] = oldKeyIdx;
+        } else if (oldKeyIdx == 0 && newKeyIdx != 0) {
+            accounts[newKeyIdx].push(Account(oldAccount.domainId, oldAccount.name, AccountStatus.NoIssues));
+            accountIdxs[oldKey] = newKeyIdx;
+        } else if (oldKeyIdx != 0 && newKeyIdx == 0) {
+            accounts[oldKeyIdx].push(Account(newAccount.domainId, newAccount.name, AccountStatus.NoIssues));
+            accountIdxs[newKey] = oldKeyIdx;
+        }
     }
     
     function getAccounts(AccountDto memory account) public view returns (Account[] memory) {
-        return accounts[keccak256(abi.encodePacked(account.domainId, account.name))];
+        bytes32 key = keccak256(abi.encodePacked(account.domainId, account.name));
+        uint keyIdx = accountIdxs[key];
+        return accounts[keyIdx];
     }
     
     function removeAccount(AccountDto memory oldAccount, AccountDto memory newAccount) public {
         bytes32 oldKey = keccak256(abi.encodePacked(oldAccount.domainId, oldAccount.name));
+        uint oldKeyIdx = accountIdxs[oldKey];
+
         bytes32 newKey = keccak256(abi.encodePacked(newAccount.domainId, newAccount.name));
         
-        for (uint i = 0; i < accounts[oldKey].length; ++i) {
-            bytes32 removeKey = keccak256(abi.encodePacked(accounts[oldKey][i].domainId, accounts[oldKey][i].name));
+        for (uint i = 0; i < accounts[oldKeyIdx].length; ++i) {
+            bytes32 removeKey = keccak256(abi.encodePacked(accounts[oldKeyIdx][i].domainId, accounts[oldKeyIdx][i].name));
             if (removeKey == newKey) {
-                accounts[oldKey][i] = accounts[oldKey][accounts[oldKey].length - 1];
-                accounts[oldKey].pop();
-                delete accounts[removeKey];
+                accounts[oldKeyIdx][i] = accounts[oldKeyIdx][accounts[oldKeyIdx].length - 1];
+                accounts[oldKeyIdx].pop();
+                delete accountIdxs[newKey];
             }
         }
     }
 
     function createClaim(uint8 claimTypes, bytes memory link, AccountDto memory account, address oracle) public returns (uint) {
         bytes32 key = keccak256(abi.encodePacked(account.domainId, account.name));
-        if (accounts[key].length == 0) accounts[key].push(Account(account.domainId, account.name, AccountStatus.NoIssues));
+        uint keyIdx = accountIdxs[key];
+        
+        // new account
+        if (keyIdx == 0) {
+            accounts.push().push(Account(account.domainId, account.name, AccountStatus.NoIssues));
+            keyIdx = accounts.length - 1;
+        }
+        
         claims.push(Claim(claimTypes, link, oracle, msg.sender, key, ClaimStatus.InProgress, block.timestamp));
+
         // ToDo: event
         uint idx = claims.length - 1;
         claimIdxByAccount[key].push(idx);
@@ -90,20 +124,34 @@ contract IdRegistry {
     function approveClaim(uint id) public {
         require(claims[id].oracle == msg.sender, "The claim can be approved by oracle only");
         require(claims[id].status != ClaimStatus.Canceled, "Can not approve canceled claim");
-        claims[id].status = ClaimStatus.Approved;
-        uint8 claimTypes = claims[id].claimTypes;
-        Account storage account = accounts[claims[id].accountIdx][0];
+        require(accountIdxs[claims[id].accountKey] != 0, "Account is not exist");
 
-        if (claimTypes == 0) {
-            account.status = AccountStatus.NoIssues;
-        } else if (claimTypes & 1 == 1) { // account mimics another one
-            account.status = AccountStatus.Scammer;
-        } else if (claimTypes & 2 == 2) { // unusual behaviour
-            account.status = AccountStatus.Exception;
-        } else if (claimTypes & 4 == 4) { // produces too many scams
-            account.status = AccountStatus.Scammer;
+        bytes32 accountKey = claims[id].accountKey;
+        uint accountIdx = accountIdxs[accountKey];
+        
+        for (uint i = 0; i < accounts[accountIdx].length; ++i) {
+            Account storage account = accounts[accountIdx][i];
+            bytes32 key = keccak256(abi.encodePacked(account.domainId, account.name));
+
+            if (accountKey == key) {
+                uint8 claimTypes = claims[id].claimTypes;
+
+                if (claimTypes == 0) {
+                    account.status = AccountStatus.NoIssues;
+                } else if (claimTypes & 1 == 1) { // account mimics another one
+                    account.status = AccountStatus.Scammer;
+                } else if (claimTypes & 2 == 2) { // unusual behaviour
+                    account.status = AccountStatus.Exception;
+                } else if (claimTypes & 4 == 4) { // produces too many scams
+                    account.status = AccountStatus.Scammer;
+                }
+                
+                claims[id].status = ClaimStatus.Approved;
+                // ToDo: event
+                break;
+            }
         }
-        // ToDo: event
+
     }
     
     function rejectClaim(uint id) public {

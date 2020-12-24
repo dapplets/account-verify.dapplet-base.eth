@@ -35,7 +35,7 @@ export type Claim = {
     link: string | null;
     oracle: string;
     author: string;
-    accountIdx: number;
+    accountKey: number;
     status: ClaimStatus;
     timestamp: Date;
 }
