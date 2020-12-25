@@ -186,7 +186,7 @@ export class ProfileLinking extends React.Component<IProps, IState> {
                   <Form.Field>
                     <Radio
                       label={(!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())) ? `${this.state.currentAccount} (already linked)` : this.state.currentAccount}
-                      checked={this.state.selectedDomains.includes(this.state.currentAccount) || !!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
+                      checked={this.state.selectedDomains.map(x => x.toLowerCase()).includes(this.state.currentAccount.toLowerCase()) || !!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
                       disabled={!!this.state.linkedAccounts.find(x => x.domainId === 3 && x.name.toLowerCase() === this.state.currentAccount.toLowerCase())}
                       onChange={() => this.setState({ selectedDomains: [this.state.currentAccount.toLowerCase()] })}
                     />
