@@ -16,9 +16,9 @@
   "scripts": {
     "start": "cross-env BROWSER=none HTTPS=true react-scripts start",
     "build": "react-scripts build",
-    "swarm:setup": "erebos website:setup --name=\"identity.dapplet-base.eth\" --http-gateway=https://swarm-gateways.net",
-    "swarm:upload": "env-cmd erebos website:publish --hash=273cd5834517427149d4141400fb79db8ff446f4cf1c96ed5fca51d92ad4b5d1 --key-env=SWARM_KEY ./build --http-gateway=https://swarm-gateways.net",
-    "deploy": "npm run build && npm run swarm:upload"
+    "archive": "tar -C build -cvf temp.tar *",
+    "swarm:upload": "curl -X POST -H \"Content-Type: application/x-tar\" -H \"Swarm-Index-Document: index.html\" -H \"Swarm-Error-Document: index.html\" --data-binary @temp.tar https://gateway.ethswarm.org/dirs",
+    "deploy": "npm run build && npm run archive && npm run swarm:upload"
   },
   "eslintConfig": {
     "extends": "react-app"
