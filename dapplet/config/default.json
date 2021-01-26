@@ -1,11 +1,11 @@
 {
     "main": {
-        "overlayUrl": "https://gateway.ethswarm.org/bzz/92d1854d32a14b00294949e15e079f71e2a2af8fb793bf20589b01762729ce86/",
+        "overlayUrl": "https://identity-management-overlay.herokuapp.com",
         "contractAddress": "0xaBD9f770ea02c2da5F1df3cF3820B0D0795106bD",
         "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
     },
     "test": {
-        "overlayUrl": "https://gateway.ethswarm.org/bzz/92d1854d32a14b00294949e15e079f71e2a2af8fb793bf20589b01762729ce86/",
+        "overlayUrl": "https://identity-management-overlay.herokuapp.com",
         "contractAddress": "0xaBD9f770ea02c2da5F1df3cF3820B0D0795106bD",
         "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
     },
