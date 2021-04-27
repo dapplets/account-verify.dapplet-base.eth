@@ -174,7 +174,7 @@ export default class Feature {
 
         if (!this._contract) {
             const contractAddress = await Core.storage.get('contractAddress');
-            this._contract = Core.contract(contractAddress, abi);
+            this._contract = Core.contract('ethereum', contractAddress, abi);
         }
 
         const key = `${account.domainId}/${account.name}`;
@@ -202,6 +202,6 @@ export default class Feature {
     }
 
     private async _getWallet() {
-        return Promise.resolve(Core.wallet());
+        return Core.wallet({ type: 'ethereum', network: 'rinkeby' });
     }
 }
