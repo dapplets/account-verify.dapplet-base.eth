@@ -39,7 +39,7 @@ export default class Feature {
 
     private _configure() {
         const { statusLine } = this.viewportAdapter.exports;
-        const { badge, button } = this.identityAdapter.exports;
+        const { avatarBadge, button } = this.identityAdapter.exports;
 
         const badgeConfig = ({
             initial: "DEFAULT",
@@ -93,7 +93,7 @@ export default class Feature {
                     }
                 }
             },
-            PROFILE_BUTTON_GROUP: [
+            PROFILE: () => [
                 button({
                     initial: "DEFAULT",
                     "DEFAULT": {
@@ -148,22 +148,18 @@ export default class Feature {
                             });
                         }
                     }
-                })
+                }),
+                avatarBadge(badgeConfig)
             ],
-            POST_SOUTH: [
+            POST: () => [
                 button({
                     initial: "DEFAULT",
                     "DEFAULT": {
                         hidden: true,
                         init: (ctx) => this._onPostStartedHandler?.(ctx)
                     }
-                })
-            ],
-            POST_AVATAR_BADGE: [
-                badge(badgeConfig)
-            ],
-            PROFILE_AVATAR_BADGE: [
-                badge(badgeConfig)
+                }),
+                avatarBadge(badgeConfig)
             ]
         });
     }
@@ -202,6 +198,9 @@ export default class Feature {
     }
 
     private async _getWallet() {
-        return Core.wallet({ type: 'ethereum', network: 'rinkeby' });
+        const wallet = await Core.wallet({ type: 'ethereum', network: 'rinkeby' });
+        console.log(wallet);
+        if (!await wallet.isConnected()) await wallet.connect();
+        return wallet;
     }
 }
